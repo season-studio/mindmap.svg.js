@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<html lang="zh-CN" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Debug Page</title>
+<script type="text/javascript" src="../node_modules/regenerator-runtime/runtime.js"></script>
+<script type="text/javascript" src="../.dist/index.js"></script>
+<style>
+    #inner::after {
+        content: var(--test);
+        border: solid 1px #000;
+        width: 170px;
+        height: 46px;
+    }
+</style>
+</head>
+<body>
+    <div d-dd="abc">
+        <img id="testi" />
+    </div>
+    <div id="test" style="width:100%; height:480px; border:1px solid #000;">
+
+    </div>
+    <script type="text/javascript">
+        window.$td = {
+            title:"hello", 
+            id:"abc123", 
+            image: {
+                href: "./img/cat.png",
+                width: 46,
+                height: 46
+            },
+            labels: ["abc", "123"],
+            children: [{
+                title:"boys", 
+                id:"1116", 
+                image: {
+                    href: "./img/studio.svg",
+                    width: 26,
+                    height: 26
+                },
+                notes: {
+                    "plain": {
+                        "content": "123asddf  s\tdfdfwer\nqwe\n\n12345\n6789\n\n\n13213\n123\n456\n789\n\nabc\nefg\njkasjdkl\nasdasd\nsss\n最佳答案\n使用contenteditable = \"true\"可能很棘手，但这是一个可能的解决方案:\n\n当单词前面带有＃时，文本为粗体\n示例:hello #world ，这是一个 #sample\n\nHTML:"
+                    },
+                    "ops": {
+                        "ops": [
+                            {
+                                "insert": '不定位可能发生以下情况 1 2 3 4 <div contenteditable id="editor"spellcheck="false"> 111111 <p><br/></p> </div> 以上就是'
+                            },
+                            {
+                                "attributes": {
+                                    "bold": true
+                                },
+                                "insert": "123"
+                            },
+                            {
+                                "attributes": {
+                                    "italic": true,
+                                    "bold": true
+                                },
+                                "insert": "asd"
+                            },
+                            {
+                                "insert": "df  s\tdf"
+                            },
+                            {
+                                "attributes": {
+                                    "underline": true
+                                },
+                                "insert": "dfwer"
+                            },
+                            {
+                                "insert": "\n"
+                            },
+                            {
+                                "attributes": {
+                                    "underline": true
+                                },
+                                "insert": "qwe"
+                            },
+                            {
+                                "insert": "\n\n"
+                            },
+                            {
+                                "attributes": {
+                                    "underline": true
+                                },
+                                "insert": "12345"
+                            },
+                            {
+                                "insert": "\n"
+                            },
+                            {
+                                "attributes": {
+                                    "underline": true
+                                },
+                                "insert": "67 8\t9"
+                            },
+                            {
+                                "insert": "\n\n\n"
+                            },
+                            {
+                                "attributes": {
+                                    "underline": true
+                                },
+                                "insert": "13213"
+                            },
+                            {
+                                "insert": "\n"
+                            },
+                            {
+                                "insert": "123"
+                            },
+                            {
+                                "attributes": {
+                                    "list": "bullet"
+                                },
+                                "insert": "\n"
+                            },
+                            {
+                                "insert": "456"
+                            },
+                            {
+                                "attributes": {
+                                    "list": "bullet"
+                                },
+                                "insert": "\n"
+                            },
+                            {
+                                "insert": "789"
+                            },
+                            {
+                                "attributes": {
+                                    "list": "bullet"
+                                },
+                                "insert": "\n"
+                            },
+                            {
+                                "insert": "\nabc"
+                            },
+                            {
+                                "attributes": {
+                                    "list": "ordered"
+                                },
+                                "insert": "\n"
+                            },
+                            {
+                                "insert": "efg"
+                            },
+                            {
+                                "attributes": {
+                                    "list": "ordered"
+                                },
+                                "insert": "\n"
+                            },
+                            {
+                                "insert": "jkasjdkl\nasdasd\nsss\n"
+                            },
+                            {
+                                "attributes": {
+                                    "bold": true
+                                },
+                                "insert": "最佳答案"
+                            },
+                            {
+                                "attributes": {
+                                    "align": "justify"
+                                },
+                                "insert": "\n"
+                            },
+                            {
+                                "insert": "使用"
+                            },
+                            {
+                                "attributes": {
+                                    "code": true
+                                },
+                                "insert": "contenteditable  =  \"t r u e\""
+                            },
+                            {
+                                "insert": "可能很棘手，但这是一个可能的解决方案:"
+                            },
+                            {
+                                "attributes": {
+                                    "align": "justify"
+                                },
+                                "insert": "\n\n"
+                            },
+                            {
+                                "insert": "当单词前面带有"
+                            },
+                            {
+                                "attributes": {
+                                    "bold": true
+                                },
+                                "insert": "＃"
+                            },
+                            {
+                                "insert": "时，文本为"
+                            },
+                            {
+                                "attributes": {
+                                    "bold": true
+                                },
+                                "insert": "粗体"
+                            },
+                            {
+                                "attributes": {
+                                    "align": "justify"
+                                },
+                                "insert": "\n"
+                            },
+                            {
+                                "insert": "示例:hello "
+                            },
+                            {
+                                "attributes": {
+                                    "bold": true
+                                },
+                                "insert": "#world "
+                            },
+                            {
+                                "insert": "，这是一个"
+                            },
+                            {
+                                "attributes": {
+                                    "bold": true
+                                },
+                                "insert": " #sample"
+                            },
+                            {
+                                "insert": "\n\n"
+                            },
+                            {
+                                "attributes": {
+                                    "color": "#333333"
+                                },
+                                "insert": "HTML:"
+                            },
+                            {
+                                "insert": "\n"
+                            }
+                        ]
+                    },
+                    "html": {
+                        "content": {
+                            "paragraphs": [
+                                {
+                                    "spans": [
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:font-weight": "bold"
+                                                }
+                                            },
+                                            "text": "1 2 \t3"
+                                        },
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:font-weight": "bold",
+                                                    "fo:font-style": "italic"
+                                                }
+                                            },
+                                            "text": "asd"
+                                        },
+                                        {
+                                            "text": "dfsdf"
+                                        },
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:text-decoration": "underline"
+                                                }
+                                            },
+                                            "text": "dfwer"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:text-decoration": "underline"
+                                                }
+                                            },
+                                            "text": "qwe"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:text-decoration": "underline"
+                                                }
+                                            },
+                                            "text": "12345"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:text-decoration": "underline"
+                                                }
+                                            },
+                                            "text": "6789"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:text-decoration": "underline"
+                                                }
+                                            },
+                                            "text": "13213"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "123"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "456"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "789"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "abc"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "efg"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "jkasjdkl"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "asdasd"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "sss"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:font-weight": "bold"
+                                                }
+                                            },
+                                            "text": "最佳答案"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "使用"
+                                        },
+                                        {
+                                            "text": "contenteditable = \"true\""
+                                        },
+                                        {
+                                            "text": "可能很棘手，但这是一个可能的解决方案:"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "当单词前面带有"
+                                        },
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:font-weight": "bold"
+                                                }
+                                            },
+                                            "text": "＃"
+                                        },
+                                        {
+                                            "text": "时，文本为"
+                                        },
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:font-weight": "bold"
+                                                }
+                                            },
+                                            "text": "粗体"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "示例:hello "
+                                        },
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:font-weight": "bold"
+                                                }
+                                            },
+                                            "text": "#world "
+                                        },
+                                        {
+                                            "text": "，这是一个"
+                                        },
+                                        {
+                                            "style": {
+                                                "type": "text",
+                                                "properties": {
+                                                    "fo:font-weight": "bold"
+                                                }
+                                            },
+                                            "text": " #sample"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": "HTML:"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "spans": [
+                                        {
+                                            "text": ""
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                children: [{
+                    title: "name", 
+                    id:"aaabbb"
+                }, {
+                    title:"home", 
+                    id:"cccddd"
+                }]
+            }, {
+                title:"girls", 
+                id:"1726",
+                priority: 4,
+                "task-marker": 7,
+                href: "https://www.baidu.com/",
+                children: [{
+                    title: "snsq",
+                    id: "17"
+                }, {
+                    title: "yjzs",
+                    id: "26"
+                }, {
+                    title: "xswg",
+                    id: "57"
+                }]
+            }, {
+                title:"man",
+                image: {
+                    href: "./img/abc.svg",
+                    width: parseInt(665 / 6),
+                    height: parseInt(162 / 6)
+                },
+                href: "xap:111",
+                children: [{
+                    title: "name",
+                    id: "aaa1111",
+                }, {
+                    title: "home",
+                    id: "dddd1111",
+                }, {
+                    title: "job",
+                    id: "bbbccceee"
+                }]
+            }
+        ]};
+
+        window.$env = new MindmapView.MindmapEnvironment();
+        window.$doc = new MindmapView.MindmapDocument($env);
+        window.$view = new MindmapView.MindmapViewer($doc, document.getElementById("test"));        
+        $env.extensionFactors.push(...MindmapView.DefaultTopicExtensions);
+        $env.extensionFactors.forEach((item) => {
+            item.register($view);
+        });
+        $doc.newDocument(() => {
+            $doc.addSheet({
+                title: "Test",
+                topic: $td
+            }).addSheet({
+                title: "Test2",
+                topic: {
+                    title: "Hello",
+                    children: [{
+                        title: "World"
+                    }]
+                }
+            });
+        });
+
+        window.$img = document.getElementById("testi");
+        window.$svg = document.querySelector("svg");
+
+        $env.addEventListener("topic-event-edit", MindmapView.MindmapViewer.dispatchTopicEventAction.bind(MindmapView.DefaultTopicEventActions));//(event) => MindmapView.invokeDefaultEditActions(event.detail));
+        $env.addEventListener("topic-event-trigger", (event) => {
+            console.log("trigger:", event.detail && event.detail.triggerContentType);
+            MindmapView.MindmapViewer.dispatchTopicEventAction.call(MindmapView.DefaultTopicEventActions, event.detail, "trigger");
+        });
+        $env.addEventListener("topic-event-change", (event) => console.log(event.detail));
+    </script>
+</body>
+</html>

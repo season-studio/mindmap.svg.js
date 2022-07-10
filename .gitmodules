@@ -1,0 +1,6 @@
+[submodule ".\\thirdpart\\eblock"]
+	path = .\\thirdpart\\eblock
+	url = https://github.com/season-studio/eblock.js.git
+[submodule ".\\thirdpart\\toolkits"]
+	path = .\\thirdpart\\toolkits
+	url = https://github.com/season-studio/toolkits.js.git
