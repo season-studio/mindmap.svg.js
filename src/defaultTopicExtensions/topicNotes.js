@@ -1,4 +1,5 @@
 export const topicNotesTemplate = `
+<!--template XML-->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <style eblock-predefined="" d-tag="topic-notes">
         .season-topic-notes {
@@ -22,12 +23,12 @@ export const topicNotesTemplate = `
             return {
                 name: "notes"
             };
-        }
+        };
         declarer.onRendering = function (_data, _, _topic) {
             if (!_data || !_data.notes) {
                 this.unmount();
             }
-        }
+        };
     ]]>
     </script>
     <g eblock-template="" season-topic-content-type="notes" class="season-topic-notes" ebevent-rendering="onRendering">

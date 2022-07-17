@@ -33,6 +33,7 @@ Class of document model describing the mindmap
     * [.newDocument(_fn, ..._args)](#MindmapDocument+newDocument) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
     * [.saveDocument()](#MindmapDocument+saveDocument) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
     * [.getThumbImage(_toBlob)](#MindmapDocument+getThumbImage) ⇒ <code>Promise.&lt;(String\|Blob)&gt;</code>
+    * [.dispose()](#MindmapDocument+dispose)
 
 <a name="MindmapDocument+MindmapDocument"></a>
 
@@ -230,6 +231,12 @@ Generate the thumb image of the current view of the document
 | --- | --- | --- |
 | _toBlob | <code>Boolean</code> | Optional. Set true if the thumb image is strored as a blob |
 
+<a name="MindmapDocument+dispose"></a>
+
+### mindmapDocument.dispose()
+Dispose the resource if you do need this document any more.
+
+**Kind**: instance method of [<code>MindmapDocument</code>](#MindmapDocument)  
 <a name="TopicImageData"></a>
 
 ## .TopicImageData : <code>Object</code>

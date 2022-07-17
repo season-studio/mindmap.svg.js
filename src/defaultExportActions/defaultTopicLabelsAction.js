@@ -2,6 +2,7 @@ import { Topic } from "../topic";
 import { MindmapAddinPanel } from "../mindmapAddinPanel";
 
 const TopicLabelsEditPanelXML = `
+<!--template XML-->
 <style>
     .season-topic-label-edit-item {
         font-size: 12px;
@@ -72,7 +73,8 @@ const TopicLabelsEditPanelOptions = {
         "mmap-layout-background": "generateBackground",
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
-        "mmap-bind-filter-edit": "labels"
+        "mmap-bind-filter-edit": "labels",
+        "mmap-bind-filter-trigger": "labels"
     },
     singletonStamp: "topic-labels-editor",
     onInitialize(_opt) {

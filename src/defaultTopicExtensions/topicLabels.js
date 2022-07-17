@@ -1,4 +1,5 @@
 export const topicLabelsTemplate = `
+<!--template XML-->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <style eblock-predefined="" d-tag="topic-labels">
         .season-topic-label > rect {
@@ -6,8 +7,8 @@ export const topicLabelsTemplate = `
             stroke-width: 0.5px;
             stroke-dasharray: 2;
             stroke: #666;
-            rx: 5px;
-            ry: 5px;
+            /* clean-css ignore:start */rx: 5px;/* clean-css ignore:end */
+            /* clean-css ignore:start */ry: 5px;/* clean-css ignore:end */
         }
         .season-topic-label > text {
             alignment-baseline: before-edge;
@@ -22,7 +23,7 @@ export const topicLabelsTemplate = `
             return {
                 name: "labels"
             };
-        }
+        };
         declarer.onRendering = function (_data, _, _topic) {
             const labels = (_data && _data.labels);
             if (!labels || !_data.labels.length) {
@@ -54,7 +55,7 @@ export const topicLabelsTemplate = `
                     x += box.width + 2;
                 });
             }
-        }
+        };
     ]]>
     </script>
     <g eblock-template="" season-topic-content-type="labels" class="season-topic-labels" ebevent-rendering="onRendering">

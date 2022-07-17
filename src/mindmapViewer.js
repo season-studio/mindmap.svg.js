@@ -11,6 +11,7 @@ import { cloneObject } from "../thirdpart/toolkits/src/cloneObject";
 import { readonlyMember } from "../thirdpart/toolkits/src/readonly";
 import { Topic } from "./topic";
 import { TopicFactor } from "./topicFactor";
+import { registerInstanceEventHandler, unregisterInstanceEventHandler } from "./miscUtilities";
 
 export
 /**
@@ -52,6 +53,7 @@ class MindmapViewer extends MindmapContainer {
      * @static
      * @param {Event} _event The event
      * @param {String} _type Optional. The type of the action. The _event.type will be used instead if this argument is ignored.
+     * @returns {Boolean} "true" means a function has been invoked, otherwise return "false".
      * @example 
      * // Dispatch the event with the custom map
      * MindmapViwer.dispatchTopicEventAction.call({ 
@@ -74,7 +76,7 @@ class MindmapViewer extends MindmapContainer {
         const eventDetail = ((_event instanceof Event) ? _event.detail : _event);
         const contentConfig = eventDetail && this[eventDetail.triggerContentType || "title"];
         const fn = contentConfig && contentConfig[_type || ((_event instanceof Event) && String(_event.type).replace(/^topic-event-/gi, ""))];
-        (typeof fn === "function") && fn(eventDetail);
+        return (typeof fn === "function") ? (fn(eventDetail), true) : false;
     }
 
     /**
@@ -89,17 +91,17 @@ class MindmapViewer extends MindmapContainer {
         let mapItem = _instance.UIControlMap[key];
         if (mapItem) {
             let fn = mapItem.action;
-            (typeof fn === "function") || _instance[fn];
+            (typeof fn === "function") || (fn = _instance[fn]);
             if (typeof fn === "function") {
                 (typeof _prefixCb === "function") && _prefixCb(mapItem);
-                fn(_event, ...(mapItem.args || []));
+                fn.call(_instance, _event, ...(mapItem.args || []));
                 return mapItem;
             }
         }
         return undefined;
     }
     
-    #eventHandlers;
+    #eventHandler;
     #sheetID;
     #uiCtrlContext;
 
@@ -121,28 +123,15 @@ class MindmapViewer extends MindmapContainer {
         this.enableDomEvent("contextmenu");
         TopicFactor.register(this);
         this.#sheetID = undefined;
-        this.#eventHandlers = {};
+        this.#eventHandler = registerInstanceEventHandler(this, env);
         this.#uiCtrlContext = {};
-
-        for (let key of Object.getOwnPropertyNames(this.constructor.prototype)) {
-            if (key.startsWith("@")) {
-                let fn = this[key];
-                if (typeof fn === "function") {
-                    key = key.substring(1);
-                    fn = (this.#eventHandlers[key] = fn.bind(this));
-                    env.addEventListener(key, fn);
-                }
-            }
-        }
     }
 
     /**
      * Dispose the resource if you don't need this viewer any more.
      */
     dispose() {
-        for (let event in this.#eventHandlers) {
-            this.env.removeEventListener(event, this.#eventHandlers[event]);
-        }
+        unregisterInstanceEventHandler(this.doc.env, this.#eventHandler);
         this.disableDomEvent("wheel");
         this.disableDomEvent("contextmenu");
         MindmapContainer.prototype.dispose.call(this);
@@ -470,12 +459,12 @@ class MindmapViewer extends MindmapContainer {
         } else if (_event instanceof MouseEvent) {
             const uiCtrlContext = this.#uiCtrlContext;
             if (_event.type === "mousedown") {
-                uiCtrlContext.type = "$move-view";
+                uiCtrlContext.type = "move-view";
                 uiCtrlContext.x = _event.clientX;
                 uiCtrlContext.y = _event.clientY;
                 this.svgElement.style.cursor = "grabbing";
             } else if (_event.type === "mousemove") {
-                if (uiCtrlContext.type === "$move-view") {
+                if (uiCtrlContext.type === "move-view") {
                     let deltaX = uiCtrlContext.x - _event.clientX;
                     let deltaY = uiCtrlContext.y - _event.clientY;
                     uiCtrlContext.x = _event.clientX;
@@ -514,12 +503,12 @@ class MindmapViewer extends MindmapContainer {
         } else if (_event instanceof MouseEvent) {
             const uiCtrlContext = this.#uiCtrlContext;
             if (_event.type === "mousedown") {
-                uiCtrlContext.type = "$zoom-view";
+                uiCtrlContext.type = "zoom-view";
                 uiCtrlContext.x = _event.clientX;
                 uiCtrlContext.y = _event.clientY;
                 this.svgElement.style.cursor = "zoom-in";
             } else if (_event.type === "mousemove") {
-                if (uiCtrlContext.type === "$zoom-view") {
+                if (uiCtrlContext.type === "zoom-view") {
                     let zoomDelta = (_opt.by === "x" ? (uiCtrlContext.x < _event.clientX) : (uiCtrlContext.y < _event.clientY));
                     zoomDelta = (zoomDelta ? (0 - (Number(_opt.delta) || 0.02)) : (Number(_opt.delta) || 0.02));
                     uiCtrlContext.x = _event.clientX;

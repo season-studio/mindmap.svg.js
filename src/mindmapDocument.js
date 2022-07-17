@@ -9,6 +9,7 @@ import { MindmapEnvironment } from "./mindmapEnv";
 import { assert } from "../thirdpart/toolkits/src/assert";
 import { cloneObject } from "../thirdpart/toolkits/src/cloneObject";
 import { readonlyMember } from "../thirdpart/toolkits/src/readonly";
+import { registerInstanceEventHandler, unregisterInstanceEventHandler } from "./miscUtilities";
 
 /**
  * The data model of the topic's image
@@ -67,7 +68,7 @@ class MindmapDocument {
 
     #attachments;
     #sheets;
-    #eventHandlers;
+    #eventHandler;
 
     /**
      * Create the instance of the MindmapDocument
@@ -80,18 +81,7 @@ class MindmapDocument {
         readonlyMember(this, "env", _env);
         this.#attachments = {};
         this.#sheets = [];
-        this.#eventHandlers = {};
-
-        for (let key of Object.getOwnPropertyNames(this.constructor.prototype)) {
-            if (key.startsWith("@")) {
-                let fn = this[key];
-                if (typeof fn === "function") {
-                    key = key.substring(1);
-                    fn = (this.#eventHandlers[key] = fn.bind(this));
-                    _env.addEventListener(key, fn);
-                }
-            }
-        }
+        this.#eventHandler = registerInstanceEventHandler(this, _env);
     }
 
     /**
@@ -342,6 +332,13 @@ class MindmapDocument {
         const param = { image: undefined, option: { toBlob: (_toBlob || false) } };
         this.env.fireEvent("topic-event-view-export-image", param);
         return param.image instanceof Promise ? param.image : Promise.resolve(param.image);
+    }
+
+    /**
+     * Dispose the resource if you do need this document any more.
+     */
+    dispose() {
+        unregisterInstanceEventHandler(this.env, this.#eventHandler);
     }
 
     /**

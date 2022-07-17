@@ -1,4 +1,5 @@
 export const topicTaskMarkerTemplate = `
+<!--template XML-->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs eblock-predefined="" d-tag="topic-task-marker">
         <symbol id="topic-task-marker-0" width="20" height="20" viewBox="-1 -1 22 22">
@@ -45,7 +46,7 @@ export const topicTaskMarkerTemplate = `
             return {
                 name: "task-marker"
             };
-        }
+        };
         declarer.onRendering = function (_data) {
             if (_data && ("task-marker" in _data)) {
                 let task = Number(_data["task-marker"]);
@@ -57,9 +58,9 @@ export const topicTaskMarkerTemplate = `
             } else {
                 this.unmount();
             }
-        }
+        };
     ]]>
     </script>
-    <use eblock-template="" season-topic-content-type="task-marker" ebevent-rendering="onRendering"></use>
+    <use eblock-template="" season-topic-content-type="task-marker" ebevent-rendering="onRendering" />
 </svg>
 `;

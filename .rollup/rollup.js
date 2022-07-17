@@ -199,6 +199,9 @@ if (require.main === module) {
     const commonjs = require('@rollup/plugin-commonjs');
     const nodePolyfills = require('rollup-plugin-node-polyfills');
     const terser = require('rollup-plugin-terser').terser;
+    const minifyHTML = require('rollup-plugin-html-literals');
+    const defaultMinifyOptions = require('minify-html-literals').defaultMinifyOptions;
+
     // import builtins from 'builtin-modules';
     module.exports = configGenerator({
         output: {
@@ -212,6 +215,26 @@ if (require.main === module) {
             }
         },
         plugins: [
+            minifyHTML({
+                options: {
+                    minifyOptions: {
+                        ...defaultMinifyOptions,
+                        keepClosingSlash: true
+                    },
+                    shouldMinify(_template) {
+                        return _template && (_template.parts instanceof Array) && _template.parts.some(part => {
+                            return part.text.includes('<!--template XML-->');
+                        });
+                    },
+                    generateSourceMap(_magicStr, _fileName) {
+                        return _magicStr.generateMap({
+                            file: `${_fileName}-converted.map`,
+                            source: _fileName,
+                            includeContent: true
+                        });
+                    }
+                }
+            }),
             nodePolyfills(),
             resolve({
                 browser: true,

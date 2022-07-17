@@ -2,14 +2,15 @@ import { Topic } from "../topic";
 import { MindmapAddinPanel } from "../mindmapAddinPanel";
 
 const TopicNotesEditorPanelXML = `
+<!--template XML-->
 <style>
     .season-topic-notes-editor-button > rect {
         width: 20px;
         height: 20px;
-        x: 0px;
-        y: 0px;
-        rx: 5px;
-        ry: 5px;
+        /* clean-css ignore:start */x: 0px;/* clean-css ignore:end */
+        /* clean-css ignore:start */y: 0px;/* clean-css ignore:end */
+        /* clean-css ignore:start */rx: 5px;/* clean-css ignore:end */
+        /* clean-css ignore:start */ry: 5px;/* clean-css ignore:end */
         fill: rgba(255,255,255,0.1);
         stroke: none;
     }
@@ -36,12 +37,12 @@ const TopicNotesEditorPanelXML = `
         fill: var(--topic-ui-danger-color);
     }
     .season-topic-notes-editor-toolbar > g > rect {
-        rx: 5px;
-        ry: 5px;
+        /* clean-css ignore:start */rx: 5px;/* clean-css ignore:end */
+        /* clean-css ignore:start */ry: 5px;/* clean-css ignore:end */
         width: 20px;
         height: 20px;
-        x: 0px;
-        y: 0px;
+        /* clean-css ignore:start */x: 0px;/* clean-css ignore:end */
+        /* clean-css ignore:start */y: 0px;/* clean-css ignore:end */
     }
 </style>
 <g mmap-layout="line" mmap-layout-margin="5" mmap-layout-padding="0" class="season-topic-notes-editor-toolbar">
@@ -509,7 +510,8 @@ const TopicNotesEditorPanelOptions = {
         "mmap-layout-background": "generateBackground",
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
-        "mmap-bind-filter-edit": "notes"
+        "mmap-bind-filter-edit": "notes",
+        "mmap-bind-filter-trigger": "notes"
     },
     singletonStamp: "topic-notes-shower",
     onInitialize(_opt) {

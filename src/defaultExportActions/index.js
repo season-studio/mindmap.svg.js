@@ -20,7 +20,7 @@ export
  */
 const DefaultTopicEventActions = {
     "title": { edit: TopicTitleEditAction },
-    "image": { edit: TopicImageEditAction, trigger: TopicImageTriggerAction },
+    "image": { /* edit: TopicImageEditAction, */ trigger: TopicImageTriggerAction },
     "priority": { edit: TopicPriorityEditAction },
     "href": { edit: TopicHRefEditAction, trigger: TopicHRefTriggerAction },
     "task-marker": { edit: TopicTaskMarkerEditAction },

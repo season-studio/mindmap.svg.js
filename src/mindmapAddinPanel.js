@@ -251,8 +251,9 @@ export function MindmapAddinPanel(_parentNode, _content, _opt) {
 
     const onFilter = (function (_event) {
         const eventDetail = _event.detail;
+        const contentType = (eventDetail && eventDetail.triggerContentType);
         const filterCode = rootNode.getAttribute(_event.type === "topic-event-trigger" ? "mmap-bind-filter-trigger" : "mmap-bind-filter-edit");
-        eventDetail && filterCode && (eventDetail.triggerContentType !== filterCode) && this.close();
+        ((!filterCode && contentType) || (contentType !== filterCode)) && this.close();
     }).bind(this);
 
     function onFilterMouseDown(_event) {

@@ -36,6 +36,7 @@ export async function TopicImageEditAction(_eventDetail) {
 }
 
 const topicImageTriggerTemplate = `
+<!--template XML-->
 <style>
     .season-topic-image-trigger {
         position: relative;
@@ -99,10 +100,11 @@ const topicImageTriggerTemplate = `
 `;
 
 const topicImageTriggerToolbarTemplate = `
+<!--template XML-->
 <style>
     .season-topic-image-trigger-toolbutton > rect {
-        rx: 6px;
-        ry: 6px;
+        /* clean-css ignore:start */rx: 6px;/* clean-css ignore:end */
+        /* clean-css ignore:start */ry: 6px;/* clean-css ignore:end */
         width: 24px;
         height: 24px;
     }

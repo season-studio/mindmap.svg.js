@@ -10,13 +10,14 @@ import { assert } from "../thirdpart/toolkits/src/assert";
 import { readonlyMember } from "../thirdpart/toolkits/src/readonly";
 
 const TopicTemplateXML = `
+<!--template XML-->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs eblock-predefined="">
         <path id="topic-fold-icon-plus" fill="#fff" fill-opacity="0.8" stroke="#000" stroke-width="1" transform="translate(-3, -1), scale(1.5, 1.5)" d="M1 4A3 3 0 1 0 8 4A3 3 0 1 0 1 4M2.5 4L6.5 4M4.5 2L4.5 6" />
         <path id="topic-fold-icon-minus" fill="#fff" fill-opacity="0.8" stroke="#000" stroke-width="1" transform="translate(-3, -1), scale(1.5, 1.5)" d="M1 4A3 3 0 1 0 8 4A3 3 0 1 0 1 4M2.5 4L6.5 4" />
         <pattern id="season-topic-drag-mask" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
-            <rect x="2" y="0" width="2" height="2" fill="#000" stroke="none"></rect>
-            <rect x="0" y="2" width="2" height="2" fill="#000" stroke="none"></rect>
+            <rect x="2" y="0" width="2" height="2" fill="#000" stroke="none" />
+            <rect x="0" y="2" width="2" height="2" fill="#000" stroke="none" />
         </pattern>
     </defs>
     <style eblock-predefined="">
@@ -27,8 +28,8 @@ const TopicTemplateXML = `
         }
 
         .season-topic-drag-mask {
-            rx: 6px;
-            ry: 6px;
+            /* clean-css ignore:start */rx: 6px;/* clean-css ignore:end */
+            /* clean-css ignore:start */ry: 6px;/* clean-css ignore:end */
             fill: url(#season-topic-drag-mask);
             fill-opacity: 0.3;
             stroke: none;
@@ -47,16 +48,16 @@ const TopicTemplateXML = `
         }
 
         [season-topic-content-group] {
-            font-size: 13px;
+            font-size: 1em;
         }
 
         [season-topic-content-group][d-topic-level="0"] {
-            font-size: 17px;
+            font-size: 1.3em;
         }
 
         .season-topic-box {
-            rx: 6px;
-            ry: 6px;
+            /* clean-css ignore:start */rx: 6px;/* clean-css ignore:end */
+            /* clean-css ignore:start */ry: 6px;/* clean-css ignore:end */
             fill: #eee;
             fill-opacity: 0.3;
             stroke: #438ac9;
@@ -82,8 +83,8 @@ const TopicTemplateXML = `
         }
 
         [d-topic-level="0"] > .season-topic-box {
-            rx: 6px;
-            ry: 6px;
+            /* clean-css ignore:start */rx: 6px;/* clean-css ignore:end */
+            /* clean-css ignore:start */ry: 6px;/* clean-css ignore:end */
             fill: #438ac9;
             fill-opacity: 0.9;
             stroke: #4472c4;
@@ -98,8 +99,8 @@ const TopicTemplateXML = `
         }
 
         [d-topic-level="1"] > .season-topic-box {
-            rx: 6px;
-            ry: 6px;
+            /* clean-css ignore:start */rx: 6px;/* clean-css ignore:end */
+            /* clean-css ignore:start */ry: 6px;/* clean-css ignore:end */
             fill: #438ac9;
             fill-opacity: 0.3;
             stroke: #438ac9;

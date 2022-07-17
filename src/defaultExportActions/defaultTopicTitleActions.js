@@ -2,27 +2,29 @@ import { MindmapAddinPanel } from "../mindmapAddinPanel";
 import { Topic } from "../topic";
 
 const TopicTitleEditorTemplate = `
-    <foreignObject>
-        <style>
-            .season-topic-title-editor {
-                outline: none;
-                border: 1px solid #777;
-                box-sizing: border-box;
-                width: 100%;
-                height: 100%;
-                color: #000;
-                background-color: #fff;
-            }
-        </style>
-        <input xmlns="http://www.w3.org/1999/xhtml" class="season-topic-title-editor" tabindex="0" mmap-event-keydown="onKeydown"></input>
-    </foreignObject>
+<!--template XML-->
+<foreignObject>
+    <style>
+        .season-topic-title-editor {
+            outline: none;
+            border: 1px solid #777;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            color: #000;
+            background-color: #fff;
+        }
+    </style>
+    <input xmlns="http://www.w3.org/1999/xhtml" class="season-topic-title-editor" tabindex="0" mmap-event-keydown="onKeydown"></input>
+</foreignObject>
 `;
 
 const TopicTitleEditorPanelOptions = {
     rootAttrs: {
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
-        "mmap-bind-filter-edit": "title"
+        "mmap-bind-filter-edit": "title",
+        "mmap-bind-filter-trigger": "title"
     },
     singletonStamp: "topic-title-editor",
     onInitialize(_opt) {

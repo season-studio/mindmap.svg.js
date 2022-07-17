@@ -1,4 +1,5 @@
 export const topicHRefTemplate = `
+<!--template XML-->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <style eblock-predefined="" d-tag="topic-href">
         .season-topic-href {
@@ -31,7 +32,7 @@ export const topicHRefTemplate = `
             return {
                 name: "href"
             };
-        }
+        };
         declarer.onRendering = function (_data, _, _topic) {
             if (!_data || !_data.href) {
                 this.unmount();
@@ -40,12 +41,12 @@ export const topicHRefTemplate = `
                 let node = this.$assignedNode.querySelector(":scope > use");
                 node && node.setAttribute("href", (type === "link") ? "#topic-href-link-icon" : "#topic-href-resource-icon");
             }
-        }
+        };
     ]]>
     </script>
     <g eblock-template="" season-topic-content-type="href" class="season-topic-href" ebevent-rendering="onRendering">
-        <rect width="20" height="20" rx="3" ry="3"></rect>
-        <use href="#topic-href-link-icon"></use>
+        <rect width="20" height="20" rx="3" ry="3" />
+        <use href="#topic-href-link-icon" />
     </g>
 </svg>
 `;

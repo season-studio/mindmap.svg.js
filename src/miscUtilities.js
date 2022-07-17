@@ -78,3 +78,36 @@ export function generateDialogBubblePath(_x, _y, _width, _height, _cornerRadius,
     path.push(`a${_cornerRadius} ${_cornerRadius} 0 0 1 ${_cornerRadius} ${0 - _cornerRadius}z`);
     return path.join("");
 }
+
+export function registerInstanceEventHandler(_obj, _eventTarget) {
+    if (_obj && _eventTarget) {
+        const handler = function (_event) {
+            const fn = _obj["@" + _event.type];
+            (typeof fn === "function") && fn.call(_obj, _event);
+        }
+        const installed = (handler.$installed = new Set());
+
+        for (let key of Object.getOwnPropertyNames(_obj.constructor.prototype)) {
+            if (key.startsWith("@") && (typeof _obj[key] === "function")) {
+                installed.add(key);
+                _eventTarget.addEventListener(key.substring(1), handler);
+            }
+        }
+        for (let key in _obj) {
+            if (key.startsWith("@") && !installed.has(key) && (typeof _obj[key] === "function")) {
+                installed.add(key);
+                _eventTarget.addEventListener(key.substring(1), handler);
+            }
+        }
+
+        return handler;
+    }
+}
+
+export function unregisterInstanceEventHandler(_eventTarget, _handler) {
+    if (_obj && _eventTarget && _handler && (_handler.$installed instanceof Set)) {
+        _handler.$installed.forEach(item => {
+            _eventTarget.removeEventListener(item.substring(1), _handler);
+        });
+    }
+}

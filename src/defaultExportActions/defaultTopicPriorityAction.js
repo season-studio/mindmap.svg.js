@@ -2,14 +2,15 @@ import { MindmapAddinPanel } from "../mindmapAddinPanel";
 import { Topic } from "../topic";
 
 const TopicPriorityEditPanelXML = `
+<!--template XML-->
 <style>
     .topic-priority-edit-item > rect {
         width: 20px;
         height: 20px; 
-        x: 0; 
-        y: 0;
-        rx: 5px;
-        ry: 5px;
+        /* clean-css ignore:start */x: 0; /* clean-css ignore:end */
+        /* clean-css ignore:start */y: 0;/* clean-css ignore:end */
+        /* clean-css ignore:start */rx: 5px;/* clean-css ignore:end */
+        /* clean-css ignore:start */ry: 5px;/* clean-css ignore:end */
     }
     .topic-priority-edit-item[d-priority-selected] > rect {
         fill: var(--topic-ui-focus-color);
@@ -22,10 +23,10 @@ const TopicPriorityEditPanelXML = `
         stroke: none;
         width: 20px;
         height: 20px;
-        x: 0; 
-        y: 0;
-        rx: 5px;
-        ry: 5px;
+        /* clean-css ignore:start */x: 0; /* clean-css ignore:end */
+        /* clean-css ignore:start */y: 0;/* clean-css ignore:end */
+        /* clean-css ignore:start */rx: 5px;/* clean-css ignore:end */
+        /* clean-css ignore:start */ry: 5px;/* clean-css ignore:end */
     }
 </style>
 <g mmap-layout="line">
@@ -86,7 +87,8 @@ const TopicPriorityEditPanelOptions = {
         "mmap-layout-background": "generateBackground",
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
-        "mmap-bind-filter-edit": "priority"
+        "mmap-bind-filter-edit": "priority",
+        "mmap-bind-filter-trigger": "priority"
     },
     singletonStamp: "topic-priority-editor",
     onInitialize(_opt) {

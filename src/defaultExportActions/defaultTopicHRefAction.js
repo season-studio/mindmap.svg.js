@@ -8,12 +8,13 @@ export function TopicHRefTriggerAction(_eventDetail) {
 }
 
 const TopicHRefEditPanelXML = `
+<!--template XML-->
 <style>
     .topic-href-edit-button > rect {
-        x: 0;
-        y: 0;
-        rx: 5px;
-        ry: 5px;
+        /* clean-css ignore:start */x: 0;/* clean-css ignore:end */
+        /* clean-css ignore:start */y: 0;/* clean-css ignore:end */
+        /* clean-css ignore:start */rx: 5px;/* clean-css ignore:end */
+        /* clean-css ignore:start */ry: 5px;/* clean-css ignore:end */
         width: 26px;
         height: 26px;
     }
@@ -51,7 +52,8 @@ const TopicHRefEditPanelOptions = {
         "mmap-layout-background": "generateBackground",
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
-        "mmap-bind-filter-edit": "href"
+        "mmap-bind-filter-edit": "href",
+        "mmap-bind-filter-trigger": "href"
     },
     singletonStamp: "topic-href-editor",
     onInitialize(_opt) {

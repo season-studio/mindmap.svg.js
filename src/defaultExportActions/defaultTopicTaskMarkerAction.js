@@ -2,14 +2,15 @@ import { MindmapAddinPanel } from "../mindmapAddinPanel";
 import { Topic } from "../topic";
 
 const TopicTaskMarkerEditPanelXML = `
+<!--template XML-->
 <style>
     .topic-task-marker-item > rect {
         width: 20px;
         height: 20px; 
-        x: 0; 
-        y: 0;
-        rx: 5px;
-        ry: 5px;
+        /* clean-css ignore:start */x: 0; /* clean-css ignore:end */
+        /* clean-css ignore:start */y: 0;/* clean-css ignore:end */
+        /* clean-css ignore:start */rx: 5px;/* clean-css ignore:end */
+        /* clean-css ignore:start */ry: 5px;/* clean-css ignore:end */
     }
     .topic-task-marker-item[d-task-marker-selected] > rect {
         fill: var(--topic-ui-focus-color);
@@ -22,10 +23,10 @@ const TopicTaskMarkerEditPanelXML = `
         stroke: none;
         width: 20px;
         height: 20px; 
-        x: 0; 
-        y: 0;
-        rx: 5px;
-        ry: 5px;
+        /* clean-css ignore:start */x: 0;/* clean-css ignore:end */
+        /* clean-css ignore:start */y: 0;/* clean-css ignore:end */
+        /* clean-css ignore:start */rx: 5px;/* clean-css ignore:end */
+        /* clean-css ignore:start */ry: 5px;/* clean-css ignore:end */
     }
 </style>
 <g mmap-layout="line">
@@ -89,7 +90,8 @@ const TopicTaskMarkerEditPanelOptions = {
         "mmap-layout-background": "generateBackground",
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
-        "mmap-bind-filter-edit": "task-marker"
+        "mmap-bind-filter-edit": "task-marker",
+        "mmap-bind-filter-trigger": "task-marker"
     },
     singletonStamp: "topic-task-marker-editor",
     onInitialize(_opt) {

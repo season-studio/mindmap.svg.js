@@ -31,7 +31,7 @@ Class of the viewer for displaying and operating the mindmap
         * [.goto-topic-with-direction(_event, _right)](#MindmapViewer+goto-topic-with-direction)
     * _static_
         * [.getContrlMapKey(_event)](#MindmapViewer.getContrlMapKey) ⇒ <code>String</code>
-        * [.dispatchTopicEventAction(_event, _type)](#MindmapViewer.dispatchTopicEventAction)
+        * [.dispatchTopicEventAction(_event, _type)](#MindmapViewer.dispatchTopicEventAction) ⇒ <code>Boolean</code>
         * [.dispatchControlMapAction(_event, _instance, _prefixCb)](#MindmapViewer.dispatchControlMapAction) ⇒ <code>Object</code>
 
 <a name="MindmapViewer+MindmapViewer"></a>
@@ -231,10 +231,11 @@ translate the event to a string used as the key of the control-map
 
 <a name="MindmapViewer.dispatchTopicEventAction"></a>
 
-### MindmapViewer.dispatchTopicEventAction(_event, _type)
+### MindmapViewer.dispatchTopicEventAction(_event, _type) ⇒ <code>Boolean</code>
 Dispatch the "topic-event-trigger" or "topic-event-edit" with the binding map.This function should be called with binding a map as the "this" object. This map is an object with the members of the actions for each element of the topic.
 
 **Kind**: static method of [<code>MindmapViewer</code>](#MindmapViewer)  
+**Returns**: <code>Boolean</code> - "true" means a function has been invoked, otherwise return "false".  
 
 | Param | Type | Description |
 | --- | --- | --- |

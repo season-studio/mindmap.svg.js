@@ -1,4 +1,5 @@
 export const topicPriorityTemplate = `
+<!--template XML-->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs eblock-predefined="" d-tag="topic-priority">
         <symbol id="topic-priority-1" width="20" height="20" viewBox="-1 -1 22 22">
@@ -35,7 +36,7 @@ export const topicPriorityTemplate = `
             return {
                 name: "priority"
             };
-        }
+        };
         declarer.onRendering = function (_data) {
             if (_data) {
                 let priority = Number(_data.priority);
@@ -45,9 +46,9 @@ export const topicPriorityTemplate = `
                     this.unmount();
                 }
             }
-        }
+        };
     ]]>
     </script>
-    <use eblock-template="" season-topic-content-type="priority" ebevent-rendering="onRendering"></use>
+    <use eblock-template="" season-topic-content-type="priority" ebevent-rendering="onRendering" />
 </svg>
 `;
