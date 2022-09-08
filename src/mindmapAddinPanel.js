@@ -13,7 +13,8 @@ function getLimitProp(_val1, _val2) {
 }
 
 function setupBackground(_node, _bgNode, _context, _opt) {
-    let generator = _opt[_node.getAttribute("mmap-layout-background")];
+    let generatorCfg = _node.getAttribute("mmap-layout-background");
+    let generator = generatorCfg && (_opt[generatorCfg] || MindmapAddinPanel.backgroundGenerator[generatorCfg]);
     if (typeof generator === "function") {
         const box = _node.getBBox();
         const left = (box.x >= 0 ? 0 : box.x);
@@ -23,12 +24,12 @@ function setupBackground(_node, _bgNode, _context, _opt) {
         _bgNode = generator.call(this, _bgNode, { left, top, width, height }, _node, _context, _opt);
         if (_bgNode) {
             _bgNode.classList.add("mmap-layout-background");
-            (_bgNode.style.display === "none") && (_bgNode.style.display = "");
+            //(_bgNode.style.display === "none") && (_bgNode.style.display = "");
             _node.insertAdjacentElement("afterbegin", _bgNode);
         }
-    } else {
+    } /* else {
         _bgNode && _bgNode.remove();
-    }
+    } */
 }
 
 function unspecialLayout(_node, _context, _opt) {
@@ -101,8 +102,8 @@ function rowLayout(_node, _context, _opt) {
 function dispacthLayout(_node, _context, _opt) {
     _context || (_context = {});
     
-    const bgNode = _node.querySelector(".mmap-layout-background");
-    bgNode && (bgNode.style.display = "none");
+    const bgNode = _node.querySelector(":scope > .mmap-layout-background");
+    bgNode && bgNode.remove();//(bgNode.style.display = "none");
 
     const layoutType = _node.getAttribute("mmap-layout");
     const fn = (MindmapAddinPanel.layout[layoutType] || unspecialLayout);
@@ -186,7 +187,7 @@ export function MindmapAddinPanel(_parentNode, _content, _opt) {
 
     const onClick = (function (_event) {
         try {
-            _event.path.forEach(node => {
+            _event.composedPath().forEach(node => {
                 const eventMapKey = node.getAttribute("mmap-event-click");
                 const fn = (eventMapKey && _opt[eventMapKey]);
                 if (typeof fn === "function") {
@@ -208,7 +209,7 @@ export function MindmapAddinPanel(_parentNode, _content, _opt) {
 
     const onDoubleClick = (function (_event) {
         try {
-            _event.path.forEach(node => {
+            _event.composedPath().forEach(node => {
                 const eventMapKey = node.getAttribute("mmap-event-dblclick");
                 const fn = (eventMapKey && _opt[eventMapKey]);
                 if (typeof fn === "function") {
@@ -230,7 +231,7 @@ export function MindmapAddinPanel(_parentNode, _content, _opt) {
 
     const onKeydown = (function (_event) {
         try {
-            _event.path.forEach(node => {
+            _event.composedPath().forEach(node => {
                 const eventMapKey = node.getAttribute("mmap-event-keydown");
                 const fn = (eventMapKey && _opt[eventMapKey]);
                 if (typeof fn === "function") {
@@ -253,7 +254,7 @@ export function MindmapAddinPanel(_parentNode, _content, _opt) {
         const eventDetail = _event.detail;
         const contentType = (eventDetail && eventDetail.triggerContentType);
         const filterCode = rootNode.getAttribute(_event.type === "topic-event-trigger" ? "mmap-bind-filter-trigger" : "mmap-bind-filter-edit");
-        ((!filterCode && contentType) || (contentType !== filterCode)) && this.close();
+        (filterCode ? (contentType !== filterCode) : (contentType && (contentType !== "title"))) && this.close();
     }).bind(this);
 
     function onFilterMouseDown(_event) {
@@ -317,6 +318,19 @@ export function MindmapAddinPanel(_parentNode, _content, _opt) {
 
 const DefaultBackgroundStyle = "fill:#fff;stroke-width:0.5px;stroke:#ccc;filter:drop-shadow(0px 3px 5px #aaa);";
 
+function setAttrStyleForNode(_node, _opt) {
+    if (_opt.attrs) {
+        for (let key in _opt.attrs) {
+            _node.setAttribute(key, _opt.attrs[key]);
+        }
+    }
+    if (_opt.style) {
+        for (let key in _opt.style) {
+            _node.style[key] = _opt.style[key];
+        }
+    }
+}
+
 readonlyMember(MindmapAddinPanel, {
     layout: readonlyMember({}, {
         line: lineLayout,
@@ -324,7 +338,7 @@ readonlyMember(MindmapAddinPanel, {
     }),
     InstanceMap,
     backgroundGenerator: readonlyMember({}, {
-        dialogBubbleBackground(_bgNode, { left, top, width, height }, _node, _context, _opt, _opt2) {
+        dialogBubble(_bgNode, { left, top, width, height }, _node, _context, _opt, _opt2) {
             if (!(_bgNode instanceof SVGPathElement)) {
                 _bgNode && _bgNode.remove();
                 _bgNode = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -339,10 +353,11 @@ readonlyMember(MindmapAddinPanel, {
                                              (Number(_opt2.raiseOffset) || 0),
                                              _opt2.raiseEdge));
                 _bgNode.setAttribute("style", DefaultBackgroundStyle);
+                setAttrStyleForNode(_bgNode, _opt2);
             }
             return _bgNode;
         },
-        rectBackground(_bgNode, { left, top, width, height }, _node, _context, _opt, _opt2) {
+        roundRect(_bgNode, { left, top, width, height }, _node, _context, _opt, _opt2) {
             if (!(_bgNode instanceof SVGRectElement)) {
                 _bgNode && _bgNode.remove();
                 _bgNode = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -350,10 +365,29 @@ readonlyMember(MindmapAddinPanel, {
             if (_bgNode) {
                 _bgNode.setAttribute("style", DefaultBackgroundStyle);
                 _bgNode.setAttribute("rx", (Number(_opt2 && _opt2.cornerRadius) || 7));
+                _bgNode.setAttribute("ry", (Number(_opt2 && _opt2.cornerRadius) || 7));
                 _bgNode.setAttribute("x", left);
                 _bgNode.setAttribute("y", top);
                 _bgNode.setAttribute("width", width);
                 _bgNode.setAttribute("height", height);
+                setAttrStyleForNode(_bgNode, _opt2);
+            }
+            return _bgNode;
+        },
+        auto(_bgNode, { left, top, width, height }, _node, _context, _opt, _opt2) {
+            if (!(_bgNode instanceof SVGRectElement)) {
+                _bgNode && _bgNode.remove();
+                _bgNode = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            }
+            if (_bgNode) {
+                _opt2 || (_opt2 = {});
+                const attrOpt = (_node.hasAttribute("d-auto-background") && JSON.parse(`{${String(_node.getAttribute(d-auto-background)).replace("\'", "\"")}}`));
+                attrOpt && (_opt2 = Object.assign(attrOpt, _opt2));
+                _bgNode.setAttribute("x", left);
+                _bgNode.setAttribute("y", top);
+                _bgNode.setAttribute("width", width);
+                _bgNode.setAttribute("height", height);
+                setAttrStyleForNode(_bgNode, _opt2);
             }
             return _bgNode;
         }

@@ -142,3 +142,19 @@
  * @property {Topic} detail.originParent Input. The origin parent topic before the position changed. This value is valid when the action is "move".
  * @property {Topic} detail.originSibling Input. The origin next sibling topic before the position changed. This value is valid when the action is "move".
  */
+
+/**
+ * Event for reporting the configurations from each component bind to the enviroment
+ * 
+ * @event topic-event-report-configuration
+ * @type {Event}
+ * @property {Object} detail.result Input/Output. The container for storage the reported configurations.
+ */
+
+/**
+ * Event for notify the global configuration has been update
+ * 
+ * @event topic-event-sync-configuration
+ * @type {Event}
+ * @property {Object} detail Input. The current global configurations.
+ */

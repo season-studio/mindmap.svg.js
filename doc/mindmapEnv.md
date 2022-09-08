@@ -15,6 +15,7 @@ The environment of the mindmap
     * [.dragable](#MindmapEnvironment+dragable) : <code>Boolean</code>
     * [.editable](#MindmapEnvironment+editable) : <code>Boolean</code>
     * [.dragContext](#MindmapEnvironment+dragContext)
+    * [.syncConfig()](#MindmapEnvironment+syncConfig)
     * [.fireEvent(_type, _param)](#MindmapEnvironment+fireEvent)
     * [.translateHRefToURL(_href)](#MindmapEnvironment+translateHRefToURL) ⇒ <code>String</code>
     * [.getHRefType(_href)](#MindmapEnvironment+getHRefType) ⇒ <code>String</code>
@@ -55,7 +56,7 @@ The default configuration of the mindmap
 | dragStartNoFocusFilterTimer | <code>Number</code> | The time to wake up the drag-drop action after mousedown in the nofocus topic |
 | resourceScheme | <code>String</code> | The scheme of the resource |
 | defaultResourceAttachmentPrefix | <code>String</code> | The default prefix of the name of the attachment |
-| placeholderImageID | <code>String</code> | The id of the predefined symbol as the placeholder of the image |
+| placeholderImageId | <code>String</code> | The id of the predefined symbol as the placeholder of the image |
 
 <a name="MindmapEnvironment+config"></a>
 
@@ -94,6 +95,12 @@ Indicate if the mindmap is editable.
 The context for drag-drop action.This data is used by the drag-drop action processor. Don't use it without the processor.The subclass of MindmapEnvironment should keep this member writable.
 
 **Kind**: instance property of [<code>MindmapEnvironment</code>](#MindmapEnvironment)  
+<a name="MindmapEnvironment+syncConfig"></a>
+
+### mindmapEnvironment.syncConfig()
+Synchronize the configuration in the enviromentUse this method to let the components in the enviroment report their configurations, and then the configurations will be set as the global parameters.
+
+**Kind**: instance method of [<code>MindmapEnvironment</code>](#MindmapEnvironment)  
 <a name="MindmapEnvironment+fireEvent"></a>
 
 ### mindmapEnvironment.fireEvent(_type, _param)

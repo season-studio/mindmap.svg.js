@@ -238,7 +238,7 @@ class MindmapContainer extends EBlockContainer {
         svgElement.setAttribute("season-mind-map-svg", generateID());
         svgElement.$scale = 1;
         _parentNode.style.overflow = "hidden";
-        const parentNodePosition = _parentNode.style.position;
+        const parentNodePosition = getComputedStyle(_parentNode).position;
         if ((parentNodePosition !== "relative") && (parentNodePosition !== "absolute")) {
             _parentNode.style.position = "relative";
         }
@@ -410,7 +410,7 @@ class MindmapContainer extends EBlockContainer {
             }
             const containerNode = this.eventContainer;
             let triggerContentType = undefined;
-            _event.path.forEach(node => {
+            _event.composedPath().forEach(node => {
                 (triggerContentType === undefined) && node.hasAttribute("season-topic-content-type") && (triggerContentType = node.getAttribute("season-topic-content-type"));
                 let eventTarget = EBlock.GetInstance(node);
                 if ((eventTarget && eventTarget.handleDomEvent) || (node === containerNode)) {

@@ -242,6 +242,7 @@ function showHtmlContent(_node, _data) {
 
 function showContent(_node, _notes) {
     if (_node instanceof Node) {
+        _notes || (_notes = {});
         if (_notes.ops) {
             showOpsContent(_node, _notes.ops);
         } else if (_notes.html && _notes.html.content) {
@@ -507,7 +508,7 @@ const TopicNotesEditorPanelOptions = {
         "mmap-layout": "row",
         "mmap-layout-margin": "5",
         "mmap-layout-padding": "10",
-        "mmap-layout-background": "generateBackground",
+        "mmap-layout-background": "dialogBubble",
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
         "mmap-bind-filter-edit": "notes",
@@ -523,9 +524,6 @@ const TopicNotesEditorPanelOptions = {
                 showContent(editorNode, _opt.topic.data.notes);
             }
         }
-    },
-    generateBackground() {
-        return MindmapAddinPanel.backgroundGenerator.dialogBubbleBackground(...arguments, {});
     },
     onAfterLayout(_opt) {
         const panelBox = this.rootNode.getBBox();

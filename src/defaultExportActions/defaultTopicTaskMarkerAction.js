@@ -87,7 +87,7 @@ const TopicTaskMarkerEditPanelOptions = {
         "mmap-layout": "row",
         "mmap-layout-margin": "5",
         "mmap-layout-padding": "5",
-        "mmap-layout-background": "generateBackground",
+        "mmap-layout-background": "dialogBubble",
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
         "mmap-bind-filter-edit": "task-marker",
@@ -100,9 +100,6 @@ const TopicTaskMarkerEditPanelOptions = {
             const node = this.rootNode.querySelector(`g[d-task-marker-value="${(taskMarker >=0 && taskMarker <= 8) ? taskMarker : "unknown"}"]`);
             node && node.setAttribute("d-task-marker-selected", "");
         }
-    },
-    generateBackground() {
-        return MindmapAddinPanel.backgroundGenerator.dialogBubbleBackground(...arguments, {});
     },
     onAfterLayout(_opt) {
         const panelBox = this.rootNode.getBBox();

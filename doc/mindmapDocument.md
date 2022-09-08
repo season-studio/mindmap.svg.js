@@ -18,22 +18,25 @@ Class of document model describing the mindmap
     * [.DefaultTopicTemplate](#MindmapDocument+DefaultTopicTemplate)
     * [.sheetCount](#MindmapDocument+sheetCount) : <code>Number</code>
     * [.firstSheet](#MindmapDocument+firstSheet) : [<code>SheetData</code>](#SheetData)
+    * [.dirty](#MindmapDocument+dirty)
     * [.getSheetByID(_id)](#MindmapDocument+getSheetByID) ⇒ [<code>SheetData</code>](#SheetData)
     * [.switchToSheet(_id, _syncCurrentView)](#MindmapDocument+switchToSheet) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
     * [.enumerateSheet()](#MindmapDocument+enumerateSheet)
     * [.removeSheet(_id, _syncCurrentView)](#MindmapDocument+removeSheet) ⇒ [<code>SheetData</code>](#SheetData)
     * [.addSheet(_newSheet, _index)](#MindmapDocument+addSheet) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
-    * [.synchronizeWithView()](#MindmapDocument+synchronizeWithView) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
+    * [.synchronizeSheetWithView()](#MindmapDocument+synchronizeSheetWithView) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
     * [.enumerateAttachment()](#MindmapDocument+enumerateAttachment)
     * [.removeAttachment(_name)](#MindmapDocument+removeAttachment) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
     * [.getAttachment(_name)](#MindmapDocument+getAttachment) ⇒ <code>Any</code>
     * [.setAttachment(_name, _data)](#MindmapDocument+setAttachment) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
     * [.clearAttachment()](#MindmapDocument+clearAttachment) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
     * [.hasAttachment(_name)](#MindmapDocument+hasAttachment) ⇒ <code>Boolean</code>
-    * [.newDocument(_fn, ..._args)](#MindmapDocument+newDocument) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
-    * [.saveDocument()](#MindmapDocument+saveDocument) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
+    * [.collectAttachments()](#MindmapDocument+collectAttachments)
+    * [.newDocument(_fn, ..._args)](#MindmapDocument+newDocument) ⇒ [<code>Promise.&lt;MindmapDocument&gt;</code>](#MindmapDocument)
+    * [.saveDocument(_fn)](#MindmapDocument+saveDocument) ⇒ <code>Any</code>
     * [.getThumbImage(_toBlob)](#MindmapDocument+getThumbImage) ⇒ <code>Promise.&lt;(String\|Blob)&gt;</code>
     * [.dispose()](#MindmapDocument+dispose)
+    * [.clearDirtyFlag(_fn)](#MindmapDocument+clearDirtyFlag)
 
 <a name="MindmapDocument+MindmapDocument"></a>
 
@@ -71,6 +74,12 @@ The count of the sheets in the mindmap document
 
 ### mindmapDocument.firstSheet : [<code>SheetData</code>](#SheetData)
 The first sheet of the mindmap document
+
+**Kind**: instance property of [<code>MindmapDocument</code>](#MindmapDocument)  
+<a name="MindmapDocument+dirty"></a>
+
+### mindmapDocument.dirty
+Check if the document has been changed
 
 **Kind**: instance property of [<code>MindmapDocument</code>](#MindmapDocument)  
 <a name="MindmapDocument+getSheetByID"></a>
@@ -130,9 +139,9 @@ Insert a new sheet into the document.If the id of the sheet had been contained 
 | _newSheet | [<code>SheetData</code>](#SheetData) | The data of the sheet inserted. A new id will be created if there is no special one in the data. |
 | _index | <code>Number</code> | Optional. The position of the sheet will be insert to. If the argument is ignored, the sheet will be insert to the end of the document. |
 
-<a name="MindmapDocument+synchronizeWithView"></a>
+<a name="MindmapDocument+synchronizeSheetWithView"></a>
 
-### mindmapDocument.synchronizeWithView() ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
+### mindmapDocument.synchronizeSheetWithView() ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
 Save the change of the view into the document
 
 **Kind**: instance method of [<code>MindmapDocument</code>](#MindmapDocument)  
@@ -199,13 +208,19 @@ Check if the an attachment specialed by the name is contained in the document
 | --- | --- | --- |
 | _name | <code>String</code> | The name of the attachment |
 
+<a name="MindmapDocument+collectAttachments"></a>
+
+### mindmapDocument.collectAttachments()
+Collect and remove the unused attachments in this document
+
+**Kind**: instance method of [<code>MindmapDocument</code>](#MindmapDocument)  
 <a name="MindmapDocument+newDocument"></a>
 
-### mindmapDocument.newDocument(_fn, ..._args) ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
+### mindmapDocument.newDocument(_fn, ..._args) ⇒ [<code>Promise.&lt;MindmapDocument&gt;</code>](#MindmapDocument)
 Reset the document as a new one.An template sheet will be inserted if the content is empty after calling the callback fucntion.The view assigned to the document will switch to the first sheet automatically after this function.
 
 **Kind**: instance method of [<code>MindmapDocument</code>](#MindmapDocument)  
-**Returns**: [<code>MindmapDocument</code>](#MindmapDocument) - This object  
+**Returns**: [<code>Promise.&lt;MindmapDocument&gt;</code>](#MindmapDocument) - This object  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -214,11 +229,16 @@ Reset the document as a new one.An template sheet will be inserted if the conte
 
 <a name="MindmapDocument+saveDocument"></a>
 
-### mindmapDocument.saveDocument() ⇒ [<code>MindmapDocument</code>](#MindmapDocument)
+### mindmapDocument.saveDocument(_fn) ⇒ <code>Any</code>
 Save the document.Almost as the same as the synchronizeSheetWithView.
 
 **Kind**: instance method of [<code>MindmapDocument</code>](#MindmapDocument)  
-**Returns**: [<code>MindmapDocument</code>](#MindmapDocument) - This object  
+**Returns**: <code>Any</code> - The result returned by the callback function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| _fn | <code>function</code> | Optional. The callback function for saving the document |
+
 <a name="MindmapDocument+getThumbImage"></a>
 
 ### mindmapDocument.getThumbImage(_toBlob) ⇒ <code>Promise.&lt;(String\|Blob)&gt;</code>
@@ -237,6 +257,17 @@ Generate the thumb image of the current view of the document
 Dispose the resource if you do need this document any more.
 
 **Kind**: instance method of [<code>MindmapDocument</code>](#MindmapDocument)  
+<a name="MindmapDocument+clearDirtyFlag"></a>
+
+### mindmapDocument.clearDirtyFlag(_fn)
+Clear the dirty flag of the document
+
+**Kind**: instance method of [<code>MindmapDocument</code>](#MindmapDocument)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| _fn | <code>function</code> | A checker function impelement increasing action. |
+
 <a name="TopicImageData"></a>
 
 ## .TopicImageData : <code>Object</code>

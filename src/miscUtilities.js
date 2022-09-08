@@ -87,11 +87,15 @@ export function registerInstanceEventHandler(_obj, _eventTarget) {
         }
         const installed = (handler.$installed = new Set());
 
-        for (let key of Object.getOwnPropertyNames(_obj.constructor.prototype)) {
-            if (key.startsWith("@") && (typeof _obj[key] === "function")) {
-                installed.add(key);
-                _eventTarget.addEventListener(key.substring(1), handler);
+        let prototype = Object.getPrototypeOf(_obj);
+        while (prototype) {
+            for (let key of Object.getOwnPropertyNames(prototype)) {
+                if (key.startsWith("@") && !installed.has(key) && (typeof _obj[key] === "function")) {
+                    installed.add(key);
+                    _eventTarget.addEventListener(key.substring(1), handler);
+                }
             }
+            prototype = Object.getPrototypeOf(prototype);
         }
         for (let key in _obj) {
             if (key.startsWith("@") && !installed.has(key) && (typeof _obj[key] === "function")) {

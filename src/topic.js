@@ -28,6 +28,42 @@ class Topic extends EBlock {
     //#region static methods
 
     /**
+     * Enumerate each resource referenced by the topic
+     * @param {MindmapEnvironment} _env The enviroment of the mindmap
+     * @param {TopicData} _data The data of the topic
+     */
+    static *enumerateReferenceResource(_env, _data) {
+        if ((_env instanceof MindmapEnvironment) && _data) {
+            if (_data.image && _data.image.src) {
+                yield _data.image.src;
+            }
+            let extResList = [];
+            try {
+                _env.extensionFactors.forEach(extFactor => {
+                    let extRes = extFactor.callScript("getReferenceResources", undefined, _env, _data);
+                    if (extRes) {
+                        if (extRes instanceof Array) {
+                            extResList = extResList.concat(extRes);
+                        } else {
+                            extResList.push(extRes);
+                        }
+                    }
+                });
+            } catch (err) {
+                _env.warn("Exception raised in enumerateReferenceResource", err);
+            }
+            for (let item of extResList) {
+                yield item;
+            }
+            if (_data.children instanceof Array) {
+                for (let subTopicData of _data.children) {
+                    yield * Topic.enumerateReferenceResource(_env, subTopicData);
+                }
+            }
+        }
+    }
+
+    /**
      * Get the first child topic of the given topic
      * @static
      * @param {Node|Topic} _nodeOrTopic The parent topic or a node contains the topic
@@ -96,7 +132,7 @@ class Topic extends EBlock {
      */
     static convertWindowPointToGraphic(_node, _x, _y) {
         (_node instanceof SVGSVGElement) || (_node = (_node instanceof SVGGraphicsElement) && _node.ownerSVGElement);
-        let ctm = _node && _node.getCTM();
+        let ctm = _node && (_node.getCTM() || _node.getScreenCTM());
         if (ctm) {
             ctm = (new DOMMatrix([ctm.a, ctm.b, ctm.c, ctm.d, 0, 0])).inverse().translate(_x, _y);
             return { x: ctm.e, y: ctm.f };
@@ -228,7 +264,7 @@ class Topic extends EBlock {
         });
     }
 
-    async #loadImageInStorage(_url, _node, _width, _height, _config) {
+    async #loadImageInStorage(_url, _href, _node, _width, _height, _config) {
         try {
             const storageNode = this.$assignedNode.ownerSVGElement.querySelector("[season-topic-image-storage]");
             if (storageNode) {
@@ -240,12 +276,13 @@ class Topic extends EBlock {
                     const id = "storeimg-" + generateID();
                     symbolNode = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
                     symbolNode.setAttribute("id", id);
+                    symbolNode.setAttribute("d-href", _href);
                     symbolNode.setAttribute("d-url", _url);
                     symbolNode.setAttribute("preserveAspectRatio", "none");
                     symbolNode.setAttribute("width", _width);
                     symbolNode.setAttribute("height", _height);
                     symbolNode.setAttribute("viewBox", `0 0 ${_width} ${_height}`);
-                    symbolNode.insertAdjacentHTML("afterbegin", `<use href="#${_config.placeholderImageID || MindmapEnvironment.DefaultConfig.placeholderImageID}" width="${_width}" height="${_height}" style="mix-blend-mode:difference;fill:#000;" stroke="none" />`);
+                    symbolNode.insertAdjacentHTML("afterbegin", `<use href="#${_config.placeholderImageId || MindmapEnvironment.DefaultConfig.placeholderImageId}" width="${_width}" height="${_height}" style="mix-blend-mode:difference;fill:#000;" stroke="none" />`);
                     storageNode.appendChild(symbolNode);
                     
                     _node.setAttribute("href", "#" + id);
@@ -311,8 +348,10 @@ class Topic extends EBlock {
         }
     }
 
-    #renderTopic(..._args) {
-        EBlock.prototype.render.apply(this, _args);
+    #renderTopic() {
+        let args = Array.prototype.splice.call(arguments, 0);
+        args[2] || (args[2] = this.env.config);
+        EBlock.prototype.render.apply(this, args);
         return this;
     }
     //#endregion
@@ -551,10 +590,12 @@ class Topic extends EBlock {
     /**
      * @summary Export the data of the topic
      * The exposed data is include the children topic of this instance
+     * @param {Boolean} _removeID if remove the ID of the topic from the data
      * @returns {TopicData} The data of the topic
      */
-    exportTopicData() {
+    exportTopicData(_removeID) {
         const data = cloneObject({}, this.data);
+        _removeID && (delete data.id);
         const children = [];
         for (let childTopic of this.enumerateChilrenTopics()) {
             children.push(childTopic.exportTopicData());
@@ -602,6 +643,7 @@ class Topic extends EBlock {
                         href: imageNode && imageNode.getAttribute("href"),
                         width: item.$width || Number(item.getAttribute("width")) || 0,
                         height: item.$height || Number(item.getAttribute("height")) || 0,
+                        sourceURL: item.getAttribute("d-url"),
                         sourceHRef: item.getAttribute("d-href")
                     };
                 }
@@ -661,12 +703,12 @@ class Topic extends EBlock {
         return this;
     }
 
-    ["on-ebevent-rendering"](_data, _context, _limitLevel, _direction) {
+    ["on-ebevent-rendering"](_data, _context, _limitLevel, _direction, _config) {
         ///////////////////////////////////////////////////////////////////////
         // rendering the content of the topic
         const curLevel = this[TOPIC_LEVEL];
-        const config = this.env.config;
         this.$assignedNode.setAttribute("season-topic-global", _data.id);
+        this.$assignedNode.setAttribute("d-topic-level", curLevel);
         (curLevel > 0) && (this[TOPIC_DIRECTION] = _direction);
         // render the content of the title
         const topicContentNode = this.#topicContentNode;
@@ -677,58 +719,59 @@ class Topic extends EBlock {
         const { width:titleWidth, height:titleHeight } = titleNode.getBBox();
         // render the extends
         const extendsNode = topicContentNode.querySelector("[season-topic-extends]");
-        this.#renderTopicExtensions(extendsNode, config, _data, this, _limitLevel, _direction);
+        this.#renderTopicExtensions(extendsNode, _config, _data, this, _limitLevel, _direction);
         const { width:extendsWidth, height:extendsHeight } = extendsNode.getBBox();
         let titleTop;
         // render the image
         let imageWidth = 0, imageHeight = 0, topicImageNode;
-        const imageURL = _data.image && this.env.translateHRefToURL(_data.image.href);
-        if (imageURL) {
+        const imageRes = _data.image && this.env.translateHRefToURL(_data.image.src);
+        if (imageRes) {
             topicImageNode = this.acquireNode(":scope > [season-topic-content-group] > .season-topic-image", this.#topicContentNode, "beforeend");
-            imageWidth = (Number(_data.image.width) || titleWidth || Number(config.suitableTitleLineWidth) || MindmapEnvironment.DefaultConfig.suitableTitleLineWidth), imageHeight = (Number(_data.image.height) || 0);
+            imageWidth = (Number(_data.image.width) || Math.max(titleWidth, Number(_config.suitableTitleLineWidth) || MindmapEnvironment.DefaultConfig.suitableTitleLineWidth));
+            imageHeight = (Number(_data.image.height) || 0);
             imageHeight || (imageHeight = imageWidth / 4 * 3);
             if (topicImageNode) {
                 topicImageNode.setAttribute("width", imageWidth);
                 topicImageNode.setAttribute("height", imageHeight);
-                this.#loadImageInStorage(imageURL, topicImageNode, imageWidth, imageHeight, config);
-                titleTop = config.padding * 2 + imageHeight;
+                this.#loadImageInStorage(imageRes.destination, imageRes.source, topicImageNode, imageWidth, imageHeight, _config);
+                titleTop = _config.padding * 2 + imageHeight;
             } else {
-                titleTop = config.padding;
+                titleTop = _config.padding;
             }
         } else {
             topicImageNode = this.acquireNode(":scope > [season-topic-content-group] > .season-topic-image");
             topicImageNode && topicImageNode.remove();
             topicImageNode = undefined;
-            titleTop = config.padding;
+            titleTop = _config.padding;
         }
         // locate the content
-        let titleAndExtendWidth = titleWidth + ((extendsWidth > 0) ? (config.padding + extendsWidth) : 0);
+        let titleAndExtendWidth = titleWidth + ((extendsWidth > 0) ? (_config.padding + extendsWidth) : 0);
         let maxWidth;
-        const suitableTitleLineWidth = (Number(config.suitableTitleLineWidth) || MindmapEnvironment.DefaultConfig.suitableTitleLineWidth);
+        const suitableTitleLineWidth = (Number(_config.suitableTitleLineWidth) || MindmapEnvironment.DefaultConfig.suitableTitleLineWidth);
         if ((titleAndExtendWidth > imageWidth) && (titleWidth > suitableTitleLineWidth || extendsWidth > suitableTitleLineWidth) && (extendsWidth > titleWidth)) {
             // the title + extends line is too long, so split them to two lines
             maxWidth = Math.max(titleWidth, imageWidth, extendsWidth);
-            titleNode.setAttribute("transform", `translate(${(titleWidth >= maxWidth) ? config.padding : (config.padding + (maxWidth - titleWidth) / 2)}, ${titleTop})`);
-            extendsNode.setAttribute("transform", `translate(${(extendsWidth >= maxWidth) ? config.padding : (config.padding + (maxWidth - extendsWidth) / 2)}, ${titleTop += config.padding + titleHeight})`);
+            titleNode.setAttribute("transform", `translate(${(titleWidth >= maxWidth) ? _config.padding : (_config.padding + (maxWidth - titleWidth) / 2)}, ${titleTop})`);
+            extendsNode.setAttribute("transform", `translate(${(extendsWidth >= maxWidth) ? _config.padding : (_config.padding + (maxWidth - extendsWidth) / 2)}, ${titleTop += _config.padding + titleHeight})`);
             titleTop += extendsHeight;
         } else {
             // the title and extends are in the same line
             let centerPadding;
             if (titleAndExtendWidth < imageWidth) {
-                centerPadding = config.padding + (imageWidth - titleAndExtendWidth) / 2;
+                centerPadding = _config.padding + (imageWidth - titleAndExtendWidth) / 2;
                 maxWidth = imageWidth;
             } else {
-                centerPadding = config.padding;
+                centerPadding = _config.padding;
                 maxWidth = titleAndExtendWidth;
             }
             titleNode.setAttribute("transform", `translate(${centerPadding}, ${titleTop})`);
-            extendsNode.setAttribute("transform", `translate(${centerPadding + config.padding + titleWidth}, ${titleTop})`);
+            extendsNode.setAttribute("transform", `translate(${centerPadding + _config.padding + titleWidth}, ${titleTop})`);
             titleTop += Math.max(titleHeight, extendsHeight);
         }
-        topicImageNode && topicImageNode.setAttribute("transform", `translate(${(imageWidth >= maxWidth) ? config.padding : (config.padding + ((maxWidth - imageWidth) / 2))}, ${config.padding})`);
+        topicImageNode && topicImageNode.setAttribute("transform", `translate(${(imageWidth >= maxWidth) ? _config.padding : (_config.padding + ((maxWidth - imageWidth) / 2))}, ${_config.padding})`);
         const boxNode = topicContentNode.querySelector(".season-topic-box");
-        const boxWidth = (_context.contentWidth = config.padding * 2 + maxWidth);
-        const boxHeight = (_context.contentHeight = config.padding + titleTop);
+        const boxWidth = (_context.contentWidth = _config.padding * 2 + maxWidth);
+        const boxHeight = (_context.contentHeight = _config.padding + titleTop);
         boxNode && (boxNode.setAttribute("width", boxWidth), boxNode.setAttribute("height", boxHeight));
         // render the fold icon
         const childrenNodes = (_context.childrenNodes = this.#getChildrenNods());
@@ -756,7 +799,7 @@ class Topic extends EBlock {
             try {
                 childrenGroupNode && childrenGroupNode.isConnected || this.$assignedNode.insertAdjacentElement("afterbegin", childrenGroupNode);
                 const dirIndexThresold = (_context.dirIndexThresold = parseInt((childrenNodes.length + 1) / 2));
-                const rightPriority = (_context.rightPriority = (String(this.env.config.directionPriority).toLowerCase() !== "left"));
+                const rightPriority = (_context.rightPriority = (String(_config.directionPriority).toLowerCase() !== "left"));
                 childrenNodes.forEach((item, index) => {
                     let childTopic = Topic.GetInstance(item);
                     childTopic && childTopic.#renderTopic(_limitLevel, (this[TOPIC_LEVEL] <= 0) ? (rightPriority ^ (index >= dirIndexThresold)) : _direction);
@@ -769,18 +812,17 @@ class Topic extends EBlock {
         }
     }
 
-    ["on-ebevent-rendered"](_data, _context, _limitLevel, _direction) {
+    ["on-ebevent-rendered"](_data, _context, _limitLevel, _direction, _config) {
         const childrenNodes = _context.childrenNodes;
         const childrenGroupNode = this[CHILDREN_GROUP_NODE];
         if (childrenNodes && (childrenNodes.length > 0) && childrenGroupNode) {
-            const config = this.env.config;
             let siblingMargin, levelMargin;
-            if ((this.level + 1) >= config.secondaryTopicLevel) {
-                siblingMargin = config.secondarySiblingMargin;
-                levelMargin = config.secondaryLevelMargin;
+            if ((this.level + 1) >= _config.secondaryTopicLevel) {
+                siblingMargin = _config.secondarySiblingMargin;
+                levelMargin = _config.secondaryLevelMargin;
             } else {
-                siblingMargin = config.siblingMargin;
-                levelMargin = config.levelMargin;
+                siblingMargin = _config.siblingMargin;
+                levelMargin = _config.levelMargin;
             }
             //const { width:contentWidth, height:contentHeight } = this.#topicContentNode.getBBox();
             const { contentWidth, contentHeight} = _context;
@@ -790,7 +832,7 @@ class Topic extends EBlock {
                 // the root topic should divid the children to left and right
                 let leftContext = {
                     itemList: [],
-                    config,
+                    _config,
                     siblingMargin,
                     levelMargin,
                     contentWidth,
@@ -798,7 +840,7 @@ class Topic extends EBlock {
                 };
                 let rightContext = {
                     itemList: [],
-                    config,
+                    _config,
                     siblingMargin,
                     levelMargin,
                     contentWidth,
@@ -826,7 +868,7 @@ class Topic extends EBlock {
                 // the no-root topic locatet the children in the specail side
                 let context = {
                     itemList: [],
-                    config,
+                    _config,
                     siblingMargin,
                     levelMargin,
                     contentWidth,
@@ -921,13 +963,14 @@ class Topic extends EBlock {
      * If the data contains the children, all the descendant topics will be created.
      * @param {TopicData} _data The data of the child topic
      * @param {Topic} _nextSiblingTopic Optional. Indicate the new topic insert before which topic. The new topic will add at the end of the children topics if the argument is ignored.
+     * @param {Boolean} _forbitNotify Set true to forbit emitting the notification event
      * @returns {Topic} The new topic
      */
-    createChild(_data, _nextSiblingTopic) {
+    createChild(_data, _nextSiblingTopic, _forbitNotify) {
         const newTopic = this.factor.generate(this[CHILDREN_GROUP_NODE], Topic, _data, this[TOPIC_LEVEL] + 1, this.env);
-        if (newTopic && (_nextSiblingTopic instanceof Topic) && this.equal(_nextSiblingTopic.parentTopic)) {
-            _nextSiblingTopic.$assignedNode.insertAdjacentElement("beforebegin", newTopic.$assignedNode);
-            newTopic.notify("topic-event-change", {
+        if (newTopic) {
+            (_nextSiblingTopic instanceof Topic) && this.equal(_nextSiblingTopic.parentTopic) && _nextSiblingTopic.$assignedNode.insertAdjacentElement("beforebegin", newTopic.$assignedNode);
+            (!_forbitNotify) && newTopic.notify("topic-event-change", {
                 action: "create"
             });
         }
@@ -939,17 +982,18 @@ class Topic extends EBlock {
      * It's the best practice to change the data of the topic by this fucntion. Changing the data directly by the data member will not notify the changing singal to the watchers.
      * @param {String} _key The key of the member in the data
      * @param {Any} _newVal The new value of the member. If this argument is undefined, the member with the key will be deleted.
+     * @param {Boolean} _forbitNotify Set true to forbit emitting the notification event
      * @returns {Topic} This instance
      */
-    changeData(_key, _newVal) {
+    changeData(_key, _newVal, _forbitNotify) {
         if (_key) {
-            const originValue = cloneObject({}, this.data);
+            const originValue = (_forbitNotify || cloneObject({}, this.data));
             if (undefined === _newVal) {
                 delete this.data[_key];
             } else {
                 this.data[_key] = _newVal;
             }
-            this.notify("topic-event-change", {
+            (!_forbitNotify) && this.notify("topic-event-change", {
                 action: "changeData",
                 key: _key,
                 originValue
@@ -962,9 +1006,10 @@ class Topic extends EBlock {
      * Move the topic to an other position
      * @param {Topic} _parentTopic The destination parent topic
      * @param {Topic} _nextSiblingTopic Optional. The destination sibling topic. The topic will move to the end of the _parentTopic's children if this argument is ignored.
+     * @param {Boolean} _forbitNotify Set true to forbit emitting the notification event
      * @returns {Topic} This instance
      */
-    moveTo(_parentTopic, _nextSiblingTopic) {
+    moveTo(_parentTopic, _nextSiblingTopic, _forbitNotify) {
         if (_parentTopic instanceof Topic) {
 
             const originParent = this.parentTopic;
@@ -983,7 +1028,7 @@ class Topic extends EBlock {
             }
             this.#changeLevel(_parentTopic[TOPIC_LEVEL] + 1);
 
-            this.notify("topic-event-change", {
+            (!_forbitNotify) && this.notify("topic-event-change", {
                 action: "move",
                 originParent,
                 originSibling
@@ -998,16 +1043,19 @@ class Topic extends EBlock {
     /**
      * Drop the topic
      * @param {Function} _rootChecker Optional. If you want to drop the root topic, you should pass a function impelement increasing action as this argument.
+     * @param {Boolean} _forbitNotify Set true to forbit emitting the notification event
      */
-    drop(_rootChecker) {
+    drop(_rootChecker, _forbitNotify) {
         let rndCode;
         if ((this.level > 0) 
             || ((typeof _rootChecker === "function") 
                 && (_rootChecker(rndCode = parseInt(Math.random() * 100)) === (rndCode + 1)))) {
 
-            (this.level > 0) && this.notify("topic-event-change", {
+            (this.level > 0) && (!_forbitNotify) && this.notify("topic-event-change", {
                 action: "drop",
             });
+
+            this.killFocus();
 
             for (let descendant of this.enumerateDescendantTopics()) {
                 descendant[CHILDREN_GROUP_NODE] = undefined;
@@ -1061,9 +1109,9 @@ class Topic extends EBlock {
                           : (this.#topicContentNode.querySelector(".season-topic-box") || this.#topicContentNode));
 
         if (node instanceof SVGGraphicsElement) {
-            let ctm = node.getCTM();
+            let ctm = (node.getCTM() || node.getScreenCTM());
             let bbox = node.getBBox();
-            const svgCTM = this.#topicContentNode.ownerSVGElement.getCTM().inverse();
+            const svgCTM = this.#topicContentNode.ownerSVGElement.getScreenCTM().inverse();
             const { e:x, f:y } = svgCTM.translate(ctm.e, ctm.f);
             let { e:width, f:height} = ctm.translate(bbox.width, bbox.height);
             width -= ctm.e, height -= ctm.f;
@@ -1081,7 +1129,7 @@ class Topic extends EBlock {
     getMatrix(_type) {
         let node = (_type ? this.#topicContentNode.querySelector(_type)
                           : (this.#topicContentNode.querySelector(".season-topic-box") || this.#topicContentNode));
-        let ctm = (node instanceof SVGGraphicsElement) && node.getCTM();
+        let ctm = (node instanceof SVGGraphicsElement) && (node.getCTM() || node.getScreenCTM());
 
         return ctm || new DOMMatrix([1, 0, 0, 1, 0, 0]);
     }
@@ -1096,7 +1144,7 @@ class Topic extends EBlock {
                           : (this.#topicContentNode.querySelector(".season-topic-box") || this.#topicContentNode));
 
         if (node instanceof SVGGraphicsElement) {
-            let ctm = node.getCTM();
+            let ctm = (node.getCTM() || node.getScreenCTM());
             let bbox = node.getBBox();
             let pt = ctm.translate(bbox.x, bbox.y);
             let et = ctm.translate(bbox.x + bbox.width, bbox.y + bbox.height);
@@ -1157,6 +1205,52 @@ class Topic extends EBlock {
             }
             return ret;
         }
+    }
+
+    /**
+     * Export the image of this topic
+     * @param {Object} _opt Optional. The options
+     * @param {String} _opt.fill The color of the background
+     * @param {String} _opt.type Optional. The type of the destination image. Such as png, jpeg, and so on
+     * @returns {Promise<{width:Number, height:Number: data:Any}>} The result
+     */
+    exportImage(_opt) {
+        let hasFocus = this.hasFocus;
+        this.env.fireEvent("topic-event-before-render");
+        hasFocus && this.killFocus();
+        let ret;
+        try {
+            _opt || (_opt = {});
+            const srcSVG = this.$assignedNode.ownerSVGElement;
+            const cloneSVG = srcSVG.cloneNode(true);
+            const stage = cloneSVG.querySelector("g[season-topic-root-node]");
+            if (stage) {
+                const { x, y, width, height } = this.$assignedNode.getBBox();
+                cloneSVG.setAttribute("overflow", "hidden");
+                cloneSVG.setAttribute("width", width);
+                cloneSVG.setAttribute("height", height);
+                cloneSVG.setAttribute("viewBox", `${x} ${y} ${width} ${height}`);
+                cloneSVG.style.fontSize = getComputedStyle(srcSVG)["font-size"];
+                stage.innerHTML = "";
+                const cloneTopicNode = this.$assignedNode.cloneNode(true);
+                cloneTopicNode.removeAttribute("transform");
+                cloneTopicNode.style.transform = "";
+                stage.appendChild(cloneTopicNode);
+                stage.querySelectorAll("[season-topic-focus]").forEach(item => item.removeAttribute("season-topic-focus"));
+                const serializer = new XMLSerializer();
+                const source = '<?xml version="1.0" standalone="no"?>\r\n' + serializer.serializeToString(cloneSVG);
+                ret = this.env.getImageData("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), Object.assign({}, _opt, {
+                    width, 
+                    height
+                }));
+            }
+        } catch (err) {
+            ret = Promise.resolve(undefined);
+            this.env.warn("Exception raised in export image from topic", err);
+        }
+        hasFocus && this.setFocus();
+        this.env.fireEvent("topic-event-after-render");
+        return ret;
     }
     
     ["on-topic-domevent-click"](_eventDetail) {

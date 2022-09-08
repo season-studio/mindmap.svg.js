@@ -32,7 +32,7 @@ class MindmapEnvironment extends EventTarget {
      * @property {Number} dragStartNoFocusFilterTimer The time to wake up the drag-drop action after mousedown in the nofocus topic
      * @property {String} resourceScheme The scheme of the resource
      * @property {String} defaultResourceAttachmentPrefix The default prefix of the name of the attachment
-     * @property {String} placeholderImageID The id of the predefined symbol as the placeholder of the image
+     * @property {String} placeholderImageId The id of the predefined symbol as the placeholder of the image
      * @static
      */
     static DefaultConfig = Object.freeze({
@@ -49,10 +49,11 @@ class MindmapEnvironment extends EventTarget {
         dragStartNoFocusFilterTimer: 100,
         resourceScheme: "xap",
         defaultResourceAttachmentPrefix: "resources/",
-        placeholderImageID: "season-topic-predefine-image-picture-placeholder"
+        placeholderImageId: "season-topic-predefine-image-picture-placeholder"
     });
 
     #extensionFactors = [];
+    #config;
 
     /**
      * Create an instance of the enviroment
@@ -60,13 +61,17 @@ class MindmapEnvironment extends EventTarget {
      */
     constructor () {
         super();
+
+        this.#config = Object.freeze(cloneObject({}, MindmapEnvironment.DefaultConfig));
     }
 
     /**
      * The working configuration of the mindmap
      * @see {@link #module_MindmapView.MindmapEnvironment+DefaultConfig|DefaultConfig} for more information
      */
-    config = cloneObject({}, MindmapEnvironment.DefaultConfig);
+    get config() {
+        return this.#config;
+    }
 
     /**
      * The list of the extensions' factor registered in the enviroment
@@ -81,6 +86,19 @@ class MindmapEnvironment extends EventTarget {
      */
     get randomID() {
         return generateID();
+    }
+
+    /**
+     * Synchronize the configuration in the enviroment
+     * Use this method to let the components in the enviroment report their configurations, and then the configurations will be set as the global parameters.
+     */
+    syncConfig() {
+        let detail = {
+            result: cloneObject({}, MindmapEnvironment.DefaultConfig)
+        };
+        this.fireEvent("topic-event-report-configuration", detail);
+        this.#config = Object.freeze(detail.result || cloneObject({}, MindmapEnvironment.DefaultConfig));
+        this.fireEvent("topic-event-sync-configuration", this.#config);
     }
 
     /**
@@ -103,7 +121,7 @@ class MindmapEnvironment extends EventTarget {
             destination: _href
         };
         this.fireEvent("topic-event-translate-href-url", param);
-        return param.destination;
+        return param;
     }
 
     /**

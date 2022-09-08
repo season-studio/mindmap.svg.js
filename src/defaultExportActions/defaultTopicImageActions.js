@@ -2,8 +2,9 @@ import { MindmapError } from "../mindmapError";
 import { assert } from "../../thirdpart/toolkits/src/assert";
 import { pickFile } from "../../thirdpart/toolkits/src/fileDlgKit";
 import { Topic } from "../topic";
+import { MindmapEnvironment } from "../mindmapEnv";
 
-async function changeImage(_topic) {
+async function changeTopicImage(_topic) {
     const file = await pickFile(".jpg,.jpeg,.png,.gif,.ico,.bmp,.svg");
     if (file instanceof Blob) {
         const param = {
@@ -15,13 +16,27 @@ async function changeImage(_topic) {
             const image = _topic.data.image;
             if (image) {
                 _topic.changeData("image", {
-                    href: param.href,
+                    src: param.href,
                     width: image.width,
                     height: image.height
                 });
             } else {
+                const config = _topic.env.config;
+                const topicWidth = _topic.getRect().width - (config.padding * 2);
+                const suitableWidth = Math.max(topicWidth, Number(config.suitableTitleLineWidth) || MindmapEnvironment.DefaultConfig.suitableTitleLineWidth);
+                const imageObj = new Image();
+                imageObj.src = URL.createObjectURL(file);
+                await imageObj.decode();
+                URL.revokeObjectURL(imageObj.src);
+                let { width, height } = imageObj;
+                if (width > suitableWidth) {
+                    height = height / width * suitableWidth;
+                    width = suitableWidth;
+                }
                 _topic.changeData("image", {
-                    href: param.href
+                    src: param.href,
+                    width,
+                    height
                 });
             }
             _topic.queueAction(() => _topic.render());
@@ -30,9 +45,11 @@ async function changeImage(_topic) {
 }
 
 export async function TopicImageEditAction(_eventDetail) {
-    const topic = _eventDetail.eventTarget;
-    assert(topic instanceof Topic, MindmapError, -1, "Cannot invoke the image edit action without an instance of Topic");
-    await changeImage(topic);
+    if (_eventDetail.force) {
+        const topic = _eventDetail.eventTarget;
+        assert(topic instanceof Topic, MindmapError, -1, "Cannot invoke the image edit action without an instance of Topic");
+        await changeTopicImage(topic);
+    }
 }
 
 const topicImageTriggerTemplate = `
@@ -157,7 +174,7 @@ function setupTopicImageTrigger(_topic, _triggerNode, _toolbarNode) {
         }
 
         async function onBrowser(_event) {
-            changeImage(_topic);
+            changeTopicImage(_topic);
             _event.preventDefault();
             _event.stopPropagation();
         }
@@ -173,7 +190,7 @@ function setupTopicImageTrigger(_topic, _triggerNode, _toolbarNode) {
         function sizingProgress(_event) {
             if (0 !== (_event.buttons & 1)) {
                 if (sizingContext) {
-                    let { e: deltaX, f: deltaY } = _triggerNode.ownerSVGElement.getCTM().inverse().translate(_event.clientX, _event.clientY);
+                    let { e: deltaX, f: deltaY } = _triggerNode.ownerSVGElement.getScreenCTM().inverse().translate(_event.clientX, _event.clientY);
                     width = sizingContext.oriWidth + (deltaX -= sizingContext.startX) * sizingContext.dx;
                     height = sizingContext.oriHeight + (deltaY -= sizingContext.startY) * sizingContext.dy;
                     (sizingContext.dx < 0) && (x = sizingContext.oriX + deltaX);
@@ -207,7 +224,7 @@ function setupTopicImageTrigger(_topic, _triggerNode, _toolbarNode) {
             for (let item in sizingNodeMap) {
                 if (_event.target.matches(item)) {
                     const {dx, dy} = sizingNodeMap[item];
-                    const startCTM = _triggerNode.ownerSVGElement.getCTM().inverse().translate(_event.clientX, _event.clientY);
+                    const startCTM = _triggerNode.ownerSVGElement.getScreenCTM().inverse().translate(_event.clientX, _event.clientY);
                     sizingContext = { dx, dy, startX: startCTM.e, startY: startCTM.f, oriWidth: width, oriHeight: height, oriX: x, oriY: y };
                     _event.preventDefault();
                     _event.stopPropagation();
@@ -221,7 +238,7 @@ function setupTopicImageTrigger(_topic, _triggerNode, _toolbarNode) {
                 if ((width > 0) && (height > 0)) {
                     let image = _topic.data.image;
                     image && _topic.changeData("image", {
-                        href: image.href,
+                        src: image.src,
                         width,
                         height
                     });

@@ -70,7 +70,7 @@ const TopicLabelsEditPanelOptions = {
         "mmap-layout": "row",
         "mmap-layout-margin": "5",
         "mmap-layout-padding": "10",
-        "mmap-layout-background": "generateBackground",
+        "mmap-layout-background": "dialogBubble",
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
         "mmap-bind-filter-edit": "labels",
@@ -83,9 +83,6 @@ const TopicLabelsEditPanelOptions = {
         this.labels = labels;
         const listContainer = this.rootNode.querySelector(".season-topic-labels-edit-list");
         labels.forEach(item => createLabelItemUI(item, listContainer));
-    },
-    generateBackground() {
-        return MindmapAddinPanel.backgroundGenerator.dialogBubbleBackground(...arguments, {});
     },
     onAfterLayout(_opt) {
         const panelBox = this.rootNode.getBBox();

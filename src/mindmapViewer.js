@@ -25,14 +25,16 @@ class MindmapViewer extends MindmapContainer {
      * translate the event to a string used as the key of the control-map
      * @static
      * @param {Event} _event The event to be translate, such as keydown, mousedown, and so on
+     * @param {Boolean} _keepCase Set true to let the case left in the result
      * @returns {String} The destination key
      */
-    static getContrlMapKey(_event) {
+    static getContrlMapKey(_event, _keepCase) {
         let mapKey = [];
         if (_event instanceof UIEvent) {
-            _event.ctrlKey && mapKey.push("ctrl");
-            _event.altKey && mapKey.push("alt");
-            _event.shiftKey && mapKey.push("shift");
+            _event.ctrlKey && mapKey.push(_keepCase ? "Ctrl" : "ctrl");
+            _event.altKey && mapKey.push(_keepCase ? "Alt" : "alt");
+            _event.shiftKey && mapKey.push(_keepCase ? "Shift" : "shift");
+            _event.metaKey && mapKey.push(_keepCase ? "Meta" : "meta");
             if (_event instanceof MouseEvent) {
                 (_event instanceof WheelEvent) && mapKey.push("wheel");
                 (0 !== (_event.buttons & 1)) && mapKey.push("mouseleft");
@@ -41,10 +43,18 @@ class MindmapViewer extends MindmapContainer {
                 (0 !== (_event.buttons & 8)) && mapKey.push("mouseback");
                 (0 !== (_event.buttons & 16)) && mapKey.push("mouseforward");
             } else if (_event instanceof KeyboardEvent) {
-                mapKey.push(String(_event.key).toLocaleLowerCase());
+                let key = String(_event.key);
+                if (_keepCase) {
+                    if ((key.length === 1) && (key[0] >= 'a') && (key[0] <= 'z')) {
+                        key = key.toLocaleUpperCase();
+                    }
+                    mapKey.push(key);
+                } else {
+                    mapKey.push(key.toLocaleLowerCase());
+                }
             }
         }
-        return mapKey.join("-");
+        return mapKey.join("+");
     }
 
     /**
@@ -125,6 +135,8 @@ class MindmapViewer extends MindmapContainer {
         this.#sheetID = undefined;
         this.#eventHandler = registerInstanceEventHandler(this, env);
         this.#uiCtrlContext = {};
+
+        env.syncConfig();
     }
 
     /**
@@ -200,7 +212,7 @@ class MindmapViewer extends MindmapContainer {
      */
     editFocusTopic(_triggerContentType) {
         let topic = this.focusTopic;
-        topic && topic.showInView().notify("topic-event-edit", {eventTarget:topic, triggerContentType:_triggerContentType});
+        topic && topic.showInView().notify("topic-event-edit", {eventTarget:topic, triggerContentType:(_triggerContentType || "title")});
         return this;
     }
 
@@ -223,7 +235,7 @@ class MindmapViewer extends MindmapContainer {
     gotoNextSiblingTopic() {
         let topic = this.focusTopic;
         topic && (topic = topic.nextSiblingTopic);
-        topic && topic.setFocus();
+        topic && topic.setFocus().showInView();
         return this;
     }
     
@@ -234,7 +246,7 @@ class MindmapViewer extends MindmapContainer {
     gotoPreviousSiblingTopic() {
         let topic = this.focusTopic;
         topic && (topic = topic.previousSiblingTopic);
-        topic && topic.setFocus();
+        topic && topic.setFocus().showInView();
         return this;
     }
     
@@ -245,7 +257,7 @@ class MindmapViewer extends MindmapContainer {
     gotoParentTopic() {
         let topic = this.focusTopic;
         topic && (topic = topic.parentTopic);
-        topic && topic.setFocus();
+        topic && topic.setFocus().showInView();
         return this;
     }
     
@@ -256,7 +268,17 @@ class MindmapViewer extends MindmapContainer {
     gotoChildrenTopic() {
         let topic = this.focusTopic;
         topic && (topic = topic.firstChildTopic);
-        topic && topic.setFocus();
+        topic && topic.setFocus().showInView();
+        return this;
+    }
+
+    /**
+     * Move to the root topic in this view
+     * @returns {MindmapViewer} This viewer
+     */
+    gotoRootTopic() {
+        let topic = this.rootTopic;
+        topic && topic.setFocus().showInView();
         return this;
     }
     
@@ -265,13 +287,14 @@ class MindmapViewer extends MindmapContainer {
      * @returns {MindmapViewer} This viewer
      */
     render() {
-        this.rootTopic.render();
+        this.rootTopic.render(...arguments);
         return this;
     }
     
     /**
      * Export the image  of the viewer
      * @param {Object} _opt Optional. The option
+     * @param {String} _opt.fill The color of the background
      * @param {String} _opt.type Optional. The type of the destination image. Such as png, jpeg, and so on
      * @param {Boolean} _opt.toBlob Optional. Set true if the image storged in a Blob
      * @returns {Promise<{width: Number, height: Number, data: Any}>} The promise resolved with the data of the image
@@ -279,6 +302,8 @@ class MindmapViewer extends MindmapContainer {
     exportImage(_opt) {
         _opt || (_opt = {});
         this.env.fireEvent("topic-event-cancel-edit");
+        let focusTopic = this.focusTopic;
+        focusTopic && focusTopic.killFocus();
         const { x, y, width, height } = this.stageContainer.getBBox();
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
@@ -286,15 +311,70 @@ class MindmapViewer extends MindmapContainer {
         svg.setAttribute("width", width);
         svg.setAttribute("height", height);
         svg.setAttribute("viewBox", `${x} ${y} ${width} ${height}`);
+        svg.style.fontSize = getComputedStyle(this.svgElement)["font-size"];
         svg.insertAdjacentHTML("afterbegin", this.svgElement.innerHTML);
         const serializer = new XMLSerializer();
         const source = '<?xml version="1.0" standalone="no"?>\r\n' + serializer.serializeToString(svg);
-        return this.env.getImageData("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), {
+        focusTopic && focusTopic.setFocus();
+        return this.env.getImageData("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), Object.assign({}, _opt, {
             width, 
-            height,
-            type: _opt.type,
-            toBlob: _opt.toBlob
-        });
+            height
+        }));
+    }
+
+    /**
+     * Handle the event of "topic-event-report-configuration"
+     * @private
+     * @param {Event} _event 
+     */
+    ["@topic-event-report-configuration"](_event) {
+        let detail = _event && _event.detail;
+        let result = ((detail && detail.result) || {});
+        try {
+            let nodeList = document.evaluate('./*[local-name(.) = "desc" and @season-topic-parameters]', this.svgElement, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+            let index = 0;
+            let nodeItem;
+            while (nodeItem = nodeList.snapshotItem(index++)) {
+                try {
+                    Object.assign(result, JSON.parse(String(nodeItem.textContent).trim()));
+                } catch (err) {
+                    this.env.warn("Exception raised in parse parameter item", err);
+                }
+            }
+        } catch (err) {
+            this.env.warn("Exception raised in query parameters", err);
+        }
+        detail && (detail.result = result);
+    }
+
+    /**
+     * Handle the event of "topic-event-sync-configuration"
+     * Update the configurations as the style properties of the svg element
+     * @private
+     * @param {Event} _event 
+     */
+     ["@topic-event-sync-configuration"](_event) {
+        try {
+            let detail = _event && _event.detail;
+            const style = this.svgElement.style;
+            let oldProperties = String(this.svgElement.getAttribute("d-custom-style-props") || "").trim();
+            oldProperties && oldProperties.split(";").forEach(item => {
+                item = item.trim();
+                item && style.removeProperty(item);
+            });
+            this.svgElement.removeAttribute("d-custom-style-props");
+            if (detail) {
+                let propNames = [];
+                Object.entries(detail).forEach(item => {
+                    let name = "--" + String(item[0]||"").replace(/[A-Z]/g, c => "-" + c.toLocaleLowerCase());
+                    propNames.push(name);
+                    style.setProperty(name, item[1]);
+                });
+                (propNames.length > 0) && this.svgElement.setAttribute("d-custom-style-props", propNames.join(";"));
+            }
+        } catch (err) {
+            this.env.warn("Exception raised in update parameters as the svg custom style value", err);
+        }
     }
 
     /**
@@ -318,10 +398,10 @@ class MindmapViewer extends MindmapContainer {
             if (sheet && sheet.id) {
                 let rootTopic = this.rootTopic;
                 rootTopic && rootTopic.drop(a => a + 1);
+                this.#sheetID = sheet.id;
                 rootTopic = TopicFactor.generate(this.stageContainer, Topic, cloneObject({}, sheet.topic), 0, this.env)
                     .render()
                     .queueAction(() => {
-                        this.#sheetID = sheet.id;
                         rootTopic && rootTopic.showInCenterOfView()
                     });
             }
@@ -344,8 +424,8 @@ class MindmapViewer extends MindmapContainer {
             });
             this.rootTopic.collectImageStorage();
             if (eventParam.attachments) {
-                for (let item in this.rootTopic.enumerateImageInStorage()) {
-                    eventParam.attachments[item.sourceURL] = item.href;
+                for (let item of this.rootTopic.enumerateImageInStorage()) {
+                    eventParam.attachments[item.sourceHRef] = item.href;
                 }
             }
         }
@@ -529,20 +609,21 @@ class MindmapViewer extends MindmapContainer {
      * Processor of moving the focus to an other topic.
      * It can be used as an action in the control-map.
      * @param {Event} _event 
-     * @param {Boolean} _right Optional. Set true means move to the topic in the right of the the current focus topic.
+     * @param {String} _dir Optional. The direction of the destination topic from the the current focus topic. This parameter can be "left" or "right"
      */
-    ["goto-topic-with-direction"](_event, _right) {
+    ["goto-topic-with-direction"](_event, _dir) {
+        const isRight = (_dir === "right")
         let topic = this.focusTopic;
         if (topic) {
             if (topic.level < 1) {
                 for (topic = topic.firstChildTopic; topic; topic = topic.nextSiblingTopic) {
-                    if (topic.direction == _right) {
+                    if (topic.direction == isRight) {
                         topic.setFocus();
                         break;
                     }
                 }
             } else {
-                if (topic.direction == _right) {
+                if (topic.direction == isRight) {
                     this.gotoChildrenTopic();
                 } else {
                     this.gotoParentTopic();
@@ -566,16 +647,17 @@ class MindmapViewer extends MindmapContainer {
      * };
      */
     UIControlMap = {
-        "ctrl-wheel": { action: "zoom-view", args: [{}] },
-        "mousemiddle": { action: "move-view" },
-        "arrowright": { action: "goto-topic-with-direction", args: [true]},
-        "arrowleft": { action: "goto-topic-with-direction", args: [false]},
+        "ctrl+wheel": { action: "zoom-view", args: [{}] },
+        "mouseleft": { action: "move-view" },
+        "arrowright": { action: "goto-topic-with-direction", args: ["right"]},
+        "arrowleft": { action: "goto-topic-with-direction", args: ["left"]},
         "arrowup": { action: "gotoPreviousSiblingTopic" },
         "arrowdown": { action: "gotoNextSiblingTopic" },
         "f2": { action: "editFocusTopic" },
         "delete": { action: "deleteFocusTopic" },
         "tab": { action: "createChildTopic" },
         "enter": { action: "createSiblingTopic" },
+        "home": { action: "gotoRootTopic" },
     };
 }
 

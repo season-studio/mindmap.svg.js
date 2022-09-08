@@ -130,6 +130,18 @@ Event for broadcasting a topic will lost the focus.
 | --- | --- | --- |
 | detail.eventTarget | <code>Topic</code> | Input. Indicate the topic this event belong to. |
 
+<a name="event_topic-event-report-configuration"></a>
+
+### "topic-event-report-configuration"
+Event for reporting the configurations from each component bind to the enviroment
+
+**Kind**: event emitted  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| detail.result | <code>Object</code> | Input/Output. The container for storage the reported configurations. |
+
 <a name="event_topic-event-set-focus"></a>
 
 ### "topic-event-set-focus"
@@ -148,6 +160,18 @@ Event for broadcasting a topic will has focus.
 Event for broadcasting the list of the sheets in the document has been changed.Adding or removing any sheet will emit this event. But changing the data of a sheet will not emit this event.
 
 **Kind**: event emitted  
+<a name="event_topic-event-sync-configuration"></a>
+
+### "topic-event-sync-configuration"
+Event for notify the global configuration has been update
+
+**Kind**: event emitted  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| detail | <code>Object</code> | Input. The current global configurations. |
+
 <a name="event_topic-event-translate-href-url"></a>
 
 ### "topic-event-translate-href-url"

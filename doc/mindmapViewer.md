@@ -24,13 +24,14 @@ Class of the viewer for displaying and operating the mindmap
         * [.gotoPreviousSiblingTopic()](#MindmapViewer+gotoPreviousSiblingTopic) ⇒ [<code>MindmapViewer</code>](#MindmapViewer)
         * [.gotoParentTopic()](#MindmapViewer+gotoParentTopic) ⇒ [<code>MindmapViewer</code>](#MindmapViewer)
         * [.gotoChildrenTopic()](#MindmapViewer+gotoChildrenTopic) ⇒ [<code>MindmapViewer</code>](#MindmapViewer)
+        * [.gotoRootTopic()](#MindmapViewer+gotoRootTopic) ⇒ [<code>MindmapViewer</code>](#MindmapViewer)
         * [.render()](#MindmapViewer+render) ⇒ [<code>MindmapViewer</code>](#MindmapViewer)
         * [.exportImage(_opt)](#MindmapViewer+exportImage) ⇒ <code>Promise.&lt;{width: Number, height: Number, data: Any}&gt;</code>
         * [.move-view(_event)](#MindmapViewer+move-view)
         * [.zoom-view(_event, _opt)](#MindmapViewer+zoom-view)
-        * [.goto-topic-with-direction(_event, _right)](#MindmapViewer+goto-topic-with-direction)
+        * [.goto-topic-with-direction(_event, _dir)](#MindmapViewer+goto-topic-with-direction)
     * _static_
-        * [.getContrlMapKey(_event)](#MindmapViewer.getContrlMapKey) ⇒ <code>String</code>
+        * [.getContrlMapKey(_event, _keepCase)](#MindmapViewer.getContrlMapKey) ⇒ <code>String</code>
         * [.dispatchTopicEventAction(_event, _type)](#MindmapViewer.dispatchTopicEventAction) ⇒ <code>Boolean</code>
         * [.dispatchControlMapAction(_event, _instance, _prefixCb)](#MindmapViewer.dispatchControlMapAction) ⇒ <code>Object</code>
 
@@ -157,6 +158,13 @@ Move the focus to the first child topic from the current focus topic
 
 **Kind**: instance method of [<code>MindmapViewer</code>](#MindmapViewer)  
 **Returns**: [<code>MindmapViewer</code>](#MindmapViewer) - This viewer  
+<a name="MindmapViewer+gotoRootTopic"></a>
+
+### mindmapViewer.gotoRootTopic() ⇒ [<code>MindmapViewer</code>](#MindmapViewer)
+Move to the root topic in this view
+
+**Kind**: instance method of [<code>MindmapViewer</code>](#MindmapViewer)  
+**Returns**: [<code>MindmapViewer</code>](#MindmapViewer) - This viewer  
 <a name="MindmapViewer+render"></a>
 
 ### mindmapViewer.render() ⇒ [<code>MindmapViewer</code>](#MindmapViewer)
@@ -175,6 +183,7 @@ Export the image  of the viewer
 | Param | Type | Description |
 | --- | --- | --- |
 | _opt | <code>Object</code> | Optional. The option |
+| _opt.fill | <code>String</code> | The color of the background |
 | _opt.type | <code>String</code> | Optional. The type of the destination image. Such as png, jpeg, and so on |
 | _opt.toBlob | <code>Boolean</code> | Optional. Set true if the image storged in a Blob |
 
@@ -207,7 +216,7 @@ Processor of changing the scale of this viewer.It can be used as an action in t
 
 <a name="MindmapViewer+goto-topic-with-direction"></a>
 
-### mindmapViewer.goto-topic-with-direction(_event, _right)
+### mindmapViewer.goto-topic-with-direction(_event, _dir)
 Processor of moving the focus to an other topic.It can be used as an action in the control-map.
 
 **Kind**: instance method of [<code>MindmapViewer</code>](#MindmapViewer)  
@@ -215,11 +224,11 @@ Processor of moving the focus to an other topic.It can be used as an action in 
 | Param | Type | Description |
 | --- | --- | --- |
 | _event | <code>Event</code> |  |
-| _right | <code>Boolean</code> | Optional. Set true means move to the topic in the right of the the current focus topic. |
+| _dir | <code>String</code> | Optional. The direction of the destination topic from the the current focus topic. This parameter can be "left" or "right" |
 
 <a name="MindmapViewer.getContrlMapKey"></a>
 
-### MindmapViewer.getContrlMapKey(_event) ⇒ <code>String</code>
+### MindmapViewer.getContrlMapKey(_event, _keepCase) ⇒ <code>String</code>
 translate the event to a string used as the key of the control-map
 
 **Kind**: static method of [<code>MindmapViewer</code>](#MindmapViewer)  
@@ -228,6 +237,7 @@ translate the event to a string used as the key of the control-map
 | Param | Type | Description |
 | --- | --- | --- |
 | _event | <code>Event</code> | The event to be translate, such as keydown, mousedown, and so on |
+| _keepCase | <code>Boolean</code> | Set true to let the case left in the result |
 
 <a name="MindmapViewer.dispatchTopicEventAction"></a>
 

@@ -28,8 +28,8 @@ const TopicTemplateXML = `
         }
 
         .season-topic-drag-mask {
-            /* clean-css ignore:start */rx: 6px;/* clean-css ignore:end */
-            /* clean-css ignore:start */ry: 6px;/* clean-css ignore:end */
+            /* clean-css ignore:start */rx: var(--topic-box-rx, 6px);/* clean-css ignore:end */
+            /* clean-css ignore:start */ry: var(--topic-box-ry, 6px);/* clean-css ignore:end */
             fill: url(#season-topic-drag-mask);
             fill-opacity: 0.3;
             stroke: none;
@@ -43,87 +43,99 @@ const TopicTemplateXML = `
             stroke-opacity: 0.6;
         }
 
+        [season-topic-root-node], .season-topic-drag-group {
+            --topic-base-fill-color: #ff6600;
+            --topic-base-line-color: #ff6600;
+            --topic-base-font-color: #fff;
+        }
+
+        [season-topic-global] {
+            --topic-fill-color: var(--topic-base-fill-color);
+
+            --topic-font-color: #000;
+            --topic-font-weight: 400;
+            --topic-font-size: 1em;
+            
+            --topic-line-color: var(--topic-base-line-color);
+            --topic-line-size: 2px;
+            --topic-line-dasharray: none;
+            --topic-line-opacity: 1;
+
+            --topic-border-color: var(--topic-line-color);
+            --topic-border-opacity: 0.3;
+            --topic-border-size: 0.5px;
+            --topic-border-dasharray: 3,1;
+
+            --topic-box-opacity: 0.01;
+            --topic-box-rx: 6px;
+            --topic-box-ry: 6px;
+        }
+
         [season-topic-global] * {
             outline: none;
         }
 
         [season-topic-content-group] {
-            font-size: 1em;
-        }
-
-        [season-topic-content-group][d-topic-level="0"] {
-            font-size: 1.3em;
+            font-size: var(--topic-font-size);
         }
 
         .season-topic-box {
-            /* clean-css ignore:start */rx: 6px;/* clean-css ignore:end */
-            /* clean-css ignore:start */ry: 6px;/* clean-css ignore:end */
-            fill: #eee;
-            fill-opacity: 0.3;
-            stroke: #438ac9;
-            stroke-opacity: 0.3;
-            stroke-dasharray: 3,1;
-            stroke-width: 0.5px;
+            /* clean-css ignore:start */rx: var(--topic-box-rx);/* clean-css ignore:end */
+            /* clean-css ignore:start */ry: var(--topic-box-ry);/* clean-css ignore:end */
+            fill: var(--topic-fill-color);
+            fill-opacity: var(--topic-box-opacity);
+            stroke: var(--topic-border-color);
+            stroke-opacity: var(--topic-border-opacity);
+            stroke-dasharray: var(--topic-border-dasharray);
+            stroke-width: var(--topic-border-size);
         }
 
         .season-topic-title {
             alignment-baseline: before-edge;
             dominant-baseline: text-before-edge;
-            fill: #000;
+            fill: var(--topic-font-color);
+            font-weight: var(--topic-font-weight);
         }
 
         .season-topic-connect-line {
             fill: none;
-            stroke: #1a2530;
-            stroke-width: 2px;
+            stroke: var(--topic-line-color);
+            stroke-width: var(--topic-line-size);
+            stroke-opacity: var(--topic-line-opacity);
+            stroke-dasharray: var(--topic-line-dasharray);
         }
 
         .season-topic-image {
             
         }
 
-        [d-topic-level="0"] > .season-topic-box {
-            /* clean-css ignore:start */rx: 6px;/* clean-css ignore:end */
-            /* clean-css ignore:start */ry: 6px;/* clean-css ignore:end */
-            fill: #438ac9;
-            fill-opacity: 0.9;
-            stroke: #4472c4;
-            stroke-opacity: 0.6;
-            stroke-width: 1.5px;
-            stroke-dasharray: none;
+        [season-topic-content-group][d-topic-level="0"] {
+            --topic-font-size: 1.3em;
+            --topic-font-color: #fff;
+            --topic-font-weight: 700;
+            --topic-box-opacity: 1;
+            --topic-border-size: 1.5px;
+            --topic-border-opacity: 1;
+            --topic-border-dasharray: none;
         }
 
-        [d-topic-level="0"] > .season-topic-title {
-            fill: #fff;
-            font-weight: 700;
+        [season-topic-content-group][d-topic-level="1"] {
+            --topic-font-weight: 700;
+            --topic-box-opacity: 0.17;
+            --topic-border-size: 1px;
+            --topic-border-opacity: 0.6;
+            --topic-border-dasharray: none;
         }
 
-        [d-topic-level="1"] > .season-topic-box {
-            /* clean-css ignore:start */rx: 6px;/* clean-css ignore:end */
-            /* clean-css ignore:start */ry: 6px;/* clean-css ignore:end */
-            fill: #438ac9;
-            fill-opacity: 0.3;
-            stroke: #438ac9;
-            stroke-opacity: 0.6;
-            stroke-width: 1px;
-            stroke-dasharray: none;
-        }
-
-        [d-topic-level="1"] > .season-topic-title {
-            font-weight: 700;
-        }
-
-        [season-topic-focus] > .season-topic-box {
-            fill: #ff0;
-            fill-opacity: 0.9;
-            stroke: #000;
-            stroke-opacity: 0.7;
-            stroke-width: 2px;
-            stroke-dasharray: none;
-        }
-
-        [season-topic-focus] > .season-topic-title {
-            fill: #000;
+        [season-topic-content-group][season-topic-focus] {
+            --topic-fill-color: var(--topic-base-fill-color);
+            --topic-font-color: var(--topic-base-font-color);
+            --topic-border-color: #F04137;
+            --topic-font-weight: 700;
+            --topic-box-opacity: 1;
+            --topic-border-opacity: 1;
+            --topic-border-size: 2px;
+            --topic-border-dasharray: none;
         }
     ]]>
     </style>
@@ -144,7 +156,7 @@ function getEventPointInGraphic(_event) {
     let target = _event.target;
     if (target instanceof SVGGraphicsElement) {
         (target instanceof SVGSVGElement) || (target = target.ownerSVGElement);
-        const ctm = target.getCTM().inverse();
+        const ctm = target.getScreenCTM().inverse();
         const svgRect = target.getBoundingClientRect();
         const targetMatrix = ctm.translate(_event.clientX - svgRect.x, _event.clientY - svgRect.y);
         return { x: targetMatrix.e, y: targetMatrix.f };
@@ -162,10 +174,12 @@ function prepareDragTipElements(_topic, _dragContext) {
                 dragStubNode = (_dragContext.dragStubNode = document.createElementNS("http://www.w3.org/2000/svg", "g"));
                 if (dragStubNode) {
                     dragStubNode.setAttribute("class", "season-topic-drag-group");
+                    dragStubNode.setAttribute("season-topic-global", _topic.$assignedNode.getAttribute("season-topic-global"));
                     let contentNode = _topic.acquireNode(":scope > [season-topic-content-group]");
                     let size = { $width:0, $height:0, $x:0, $y:0 };
                     if (contentNode) {
                         contentNode = contentNode.cloneNode(true);
+                        contentNode.removeAttribute("season-topic-focus");
                         let itemNode = contentNode.querySelector('.season-topic-box');
                         if (itemNode && (itemNode = itemNode.cloneNode())) {
                             itemNode.setAttribute("class", "season-topic-drag-mask");

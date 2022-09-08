@@ -28,7 +28,7 @@ Class of the topic
         * [.enumerateDescendantTopics()](#Topic+enumerateDescendantTopics)
         * [.enumerateTopics()](#Topic+enumerateTopics)
         * [.getTopicByID(_id)](#Topic+getTopicByID) ⇒ [<code>Topic</code>](#Topic)
-        * [.exportTopicData()](#Topic+exportTopicData) ⇒ <code>TopicData</code>
+        * [.exportTopicData(_removeID)](#Topic+exportTopicData) ⇒ <code>TopicData</code>
         * [.collectImageStorage()](#Topic+collectImageStorage)
         * [.enumerateImageInStorage()](#Topic+enumerateImageInStorage)
         * [.showInCenterOfView()](#Topic+showInCenterOfView) ⇒ [<code>Topic</code>](#Topic)
@@ -38,10 +38,10 @@ Class of the topic
         * [.getFocus()](#Topic+getFocus) ⇒ [<code>Topic</code>](#Topic)
         * [.killFocus()](#Topic+killFocus) ⇒ [<code>Topic</code>](#Topic)
         * [.setFocus(_resultForChecked)](#Topic+setFocus) ⇒ <code>Boolean</code> \| [<code>Topic</code>](#Topic)
-        * [.createChild(_data, _nextSiblingTopic)](#Topic+createChild) ⇒ [<code>Topic</code>](#Topic)
-        * [.changeData(_key, _newVal)](#Topic+changeData) ⇒ [<code>Topic</code>](#Topic)
-        * [.moveTo(_parentTopic, _nextSiblingTopic)](#Topic+moveTo) ⇒ [<code>Topic</code>](#Topic)
-        * [.drop(_rootChecker)](#Topic+drop)
+        * [.createChild(_data, _nextSiblingTopic, _forbitNotify)](#Topic+createChild) ⇒ [<code>Topic</code>](#Topic)
+        * [.changeData(_key, _newVal, _forbitNotify)](#Topic+changeData) ⇒ [<code>Topic</code>](#Topic)
+        * [.moveTo(_parentTopic, _nextSiblingTopic, _forbitNotify)](#Topic+moveTo) ⇒ [<code>Topic</code>](#Topic)
+        * [.drop(_rootChecker, _forbitNotify)](#Topic+drop)
         * [.getRect(_type)](#Topic+getRect) ⇒ <code>DOMRect</code>
         * [.getBBox(_type)](#Topic+getBBox) ⇒ <code>SVGRect</code>
         * [.getGraphicRect(_type)](#Topic+getGraphicRect) ⇒ <code>Object</code>
@@ -49,7 +49,9 @@ Class of the topic
         * [.getRectInViewport(_type)](#Topic+getRectInViewport) ⇒ <code>Object</code>
         * [.getGlobalRect()](#Topic+getGlobalRect) ⇒ <code>Object</code>
         * [.getExtensionInstance(_extensionName)](#Topic+getExtensionInstance) ⇒ <code>TopicExtension</code>
+        * [.exportImage(_opt)](#Topic+exportImage) ⇒ <code>Promise.&lt;{width:Number, height:Number: data:Any}&gt;</code>
     * _static_
+        * [.enumerateReferenceResource(_env, _data)](#Topic.enumerateReferenceResource)
         * [.getFirstChildTopic(_nodeOrTopic)](#Topic.getFirstChildTopic) ⇒ [<code>Topic</code>](#Topic)
         * [.getMindRootNode(_node)](#Topic.getMindRootNode) ⇒ <code>Node</code>
         * [.getTopicByID(_node, _id)](#Topic.getTopicByID) ⇒ [<code>Topic</code>](#Topic)
@@ -199,10 +201,15 @@ Find a special topic contained in this instance
 
 <a name="Topic+exportTopicData"></a>
 
-### topic.exportTopicData() ⇒ <code>TopicData</code>
+### topic.exportTopicData(_removeID) ⇒ <code>TopicData</code>
 **Kind**: instance method of [<code>Topic</code>](#Topic)  
 **Summary**: Export the data of the topicThe exposed data is include the children topic of this instance  
 **Returns**: <code>TopicData</code> - The data of the topic  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| _removeID | <code>Boolean</code> | if remove the ID of the topic from the data |
+
 <a name="Topic+collectImageStorage"></a>
 
 ### topic.collectImageStorage()
@@ -277,7 +284,7 @@ Set the focus of this topic
 
 <a name="Topic+createChild"></a>
 
-### topic.createChild(_data, _nextSiblingTopic) ⇒ [<code>Topic</code>](#Topic)
+### topic.createChild(_data, _nextSiblingTopic, _forbitNotify) ⇒ [<code>Topic</code>](#Topic)
 Create a child topic in this topic.If the data contains the children, all the descendant topics will be created.
 
 **Kind**: instance method of [<code>Topic</code>](#Topic)  
@@ -287,10 +294,11 @@ Create a child topic in this topic.If the data contains the children, all the d
 | --- | --- | --- |
 | _data | <code>TopicData</code> | The data of the child topic |
 | _nextSiblingTopic | [<code>Topic</code>](#Topic) | Optional. Indicate the new topic insert before which topic. The new topic will add at the end of the children topics if the argument is ignored. |
+| _forbitNotify | <code>Boolean</code> | Set true to forbit emitting the notification event |
 
 <a name="Topic+changeData"></a>
 
-### topic.changeData(_key, _newVal) ⇒ [<code>Topic</code>](#Topic)
+### topic.changeData(_key, _newVal, _forbitNotify) ⇒ [<code>Topic</code>](#Topic)
 **Kind**: instance method of [<code>Topic</code>](#Topic)  
 **Summary**: Change the data of the topicIt's the best practice to change the data of the topic by this fucntion. Changing the data directly by the data member will not notify the changing singal to the watchers.  
 **Returns**: [<code>Topic</code>](#Topic) - This instance  
@@ -299,10 +307,11 @@ Create a child topic in this topic.If the data contains the children, all the d
 | --- | --- | --- |
 | _key | <code>String</code> | The key of the member in the data |
 | _newVal | <code>Any</code> | The new value of the member. If this argument is undefined, the member with the key will be deleted. |
+| _forbitNotify | <code>Boolean</code> | Set true to forbit emitting the notification event |
 
 <a name="Topic+moveTo"></a>
 
-### topic.moveTo(_parentTopic, _nextSiblingTopic) ⇒ [<code>Topic</code>](#Topic)
+### topic.moveTo(_parentTopic, _nextSiblingTopic, _forbitNotify) ⇒ [<code>Topic</code>](#Topic)
 Move the topic to an other position
 
 **Kind**: instance method of [<code>Topic</code>](#Topic)  
@@ -312,10 +321,11 @@ Move the topic to an other position
 | --- | --- | --- |
 | _parentTopic | [<code>Topic</code>](#Topic) | The destination parent topic |
 | _nextSiblingTopic | [<code>Topic</code>](#Topic) | Optional. The destination sibling topic. The topic will move to the end of the _parentTopic's children if this argument is ignored. |
+| _forbitNotify | <code>Boolean</code> | Set true to forbit emitting the notification event |
 
 <a name="Topic+drop"></a>
 
-### topic.drop(_rootChecker)
+### topic.drop(_rootChecker, _forbitNotify)
 Drop the topic
 
 **Kind**: instance method of [<code>Topic</code>](#Topic)  
@@ -323,6 +333,7 @@ Drop the topic
 | Param | Type | Description |
 | --- | --- | --- |
 | _rootChecker | <code>function</code> | Optional. If you want to drop the root topic, you should pass a function impelement increasing action as this argument. |
+| _forbitNotify | <code>Boolean</code> | Set true to forbit emitting the notification event |
 
 <a name="Topic+getRect"></a>
 
@@ -402,6 +413,32 @@ Get an instance of the special extension element in this topic
 | Param | Type | Description |
 | --- | --- | --- |
 | _extensionName | <code>String</code> | The name of the extension element. such as "task-marker", "priority", and so on. |
+
+<a name="Topic+exportImage"></a>
+
+### topic.exportImage(_opt) ⇒ <code>Promise.&lt;{width:Number, height:Number: data:Any}&gt;</code>
+Export the image of this topic
+
+**Kind**: instance method of [<code>Topic</code>](#Topic)  
+**Returns**: <code>Promise.&lt;{width:Number, height:Number: data:Any}&gt;</code> - The result  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| _opt | <code>Object</code> | Optional. The options |
+| _opt.fill | <code>String</code> | The color of the background |
+| _opt.type | <code>String</code> | Optional. The type of the destination image. Such as png, jpeg, and so on |
+
+<a name="Topic.enumerateReferenceResource"></a>
+
+### Topic.enumerateReferenceResource(_env, _data)
+Enumerate each resource referenced by the topic
+
+**Kind**: static method of [<code>Topic</code>](#Topic)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| _env | <code>MindmapEnvironment</code> | The enviroment of the mindmap |
+| _data | <code>TopicData</code> | The data of the topic |
 
 <a name="Topic.getFirstChildTopic"></a>
 

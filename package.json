@@ -6,7 +6,8 @@
   "files": [
     ".dist",
     "readme.md",
-    "doc"
+    "doc",
+    "package.json"
   ],
   "scripts": {
     "rollup-release": "node .\\.rollup\\rollup.js --compress true --generate-doc ./doc ./src",
@@ -21,12 +22,13 @@
     "webview",
     "js"
   ],
+  "homepage": "https://github.com/season-studio/mindmap.svg.js/blob/main/readme.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/season-studio/mindmap.svg.js.git"
   },
   "bugs": {
-    "url": "https://github.com/season-studio/mindmap.svg.js.git/issues",
+    "url": "https://github.com/season-studio/mindmap.svg.js/issues",
     "email": "season-studio@outlook.com"
   },
   "devDependencies": {

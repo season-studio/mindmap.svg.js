@@ -84,7 +84,7 @@ const TopicPriorityEditPanelOptions = {
         "mmap-layout": "row",
         "mmap-layout-margin": "5",
         "mmap-layout-padding": "5",
-        "mmap-layout-background": "generateBackground",
+        "mmap-layout-background": "dialogBubble",
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
         "mmap-bind-filter-edit": "priority",
@@ -94,9 +94,6 @@ const TopicPriorityEditPanelOptions = {
     onInitialize(_opt) {
         const node = this.rootNode.querySelector(`g[d-priority-value="${_opt.topic.data.priority}"]`);
         node && node.setAttribute("d-priority-selected", "");
-    },
-    generateBackground() {
-        return MindmapAddinPanel.backgroundGenerator.dialogBubbleBackground(...arguments, {});
     },
     onAfterLayout(_opt) {
         const panelBox = this.rootNode.getBBox();

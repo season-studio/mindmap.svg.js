@@ -70,8 +70,10 @@ const TopicTitleEditorPanelOptions = {
             this.inputNode.style.fontWeight = titleNodeStyle["font-weight"];
         }
 
-        this.inputNode.focus();
-        this.inputNode.select();
+        this.topic.queueAction(() => {
+            this.inputNode.focus();
+            this.inputNode.select();
+        });
     },
     onKeydown(_event, _node, _opt) {
         let key = String(_event.key).toLowerCase();

@@ -10,6 +10,7 @@ import { assert } from "../thirdpart/toolkits/src/assert";
 import { cloneObject } from "../thirdpart/toolkits/src/cloneObject";
 import { readonlyMember } from "../thirdpart/toolkits/src/readonly";
 import { registerInstanceEventHandler, unregisterInstanceEventHandler } from "./miscUtilities";
+import { Topic } from "./topic";
 
 /**
  * The data model of the topic's image
@@ -52,7 +53,7 @@ class MindmapDocument {
      * @static
      */
     static DefaultSheetTemplate = {
-        title: "New Sheet",
+        title: "Untitled Sheet",
         topic: { 
             title: "Main Topic" 
         }
@@ -69,6 +70,7 @@ class MindmapDocument {
     #attachments;
     #sheets;
     #eventHandler;
+    #dirty;
 
     /**
      * Create the instance of the MindmapDocument
@@ -82,6 +84,7 @@ class MindmapDocument {
         this.#attachments = {};
         this.#sheets = [];
         this.#eventHandler = registerInstanceEventHandler(this, _env);
+        this.#dirty = false;
     }
 
     /**
@@ -128,7 +131,7 @@ class MindmapDocument {
     switchToSheet(_id, _syncCurrentView) {
         const sheet = this.getSheetByID(_id);
         if (sheet) {
-            _syncCurrentView && this.synchronizeWithView();
+            _syncCurrentView && this.synchronizeSheetWithView();
             this.env.fireEvent("topic-event-view-switch-sheet", { sheet });
         } else {
             this.env.warn(`sheet[${_id}] no found`);
@@ -158,11 +161,12 @@ class MindmapDocument {
      * @returns {SheetData} The data of the sheet which is removed
      */
     removeSheet(_id, _syncCurrentView) {
-        _syncCurrentView && this.synchronizeWithView();
+        _syncCurrentView && this.synchronizeSheetWithView();
         let oriSheet, index;
         for (index in this.#sheets) {
             if (this.#sheets[index].id === _id) {
                 oriSheet = this.#sheets.splice(index, 1);
+                this.#dirty = true;
                 (index > 0) && (index -= 1);
                 break;
             }
@@ -194,6 +198,7 @@ class MindmapDocument {
             } else {
                 this.#sheets.splice(_index, 0, _newSheet);
             }
+            this.#dirty = true;
             this.env.fireEvent("topic-event-sheet-list-changed");
         }
         return this;
@@ -203,13 +208,15 @@ class MindmapDocument {
      * Save the change of the view into the document
      * @returns {MindmapDocument} This object
      */
-    synchronizeWithView() {
+    synchronizeSheetWithView() {
         const param = {
             sheets: [],
             attachments: {}
         };
         this.env.fireEvent("topic-event-view-submit", param);
+        let count = 0;
         for (let { sheetID, topicData } of param.sheets) {
+            count ++;
             let sheet = this.getSheetByID(sheetID);
             if (sheet) {
                 sheet.topic = topicData;
@@ -217,6 +224,7 @@ class MindmapDocument {
                 this.addSheet({ topic: topicData });
             }
         }
+        (count > 0) && (this.#dirty = true);
         for (let name in param.attachments) {
             this.hasAttachment(name) || this.setAttachment(name, param.attachments[name]);
         }
@@ -246,6 +254,7 @@ class MindmapDocument {
         const data = this.#attachments[_name];
         (data instanceof Blob) && data.$url && URL.revokeObjectURL(data.$url);
         delete this.#attachments[_name];
+        this.#dirty = true;
         return this;
     }
 
@@ -268,6 +277,7 @@ class MindmapDocument {
     setAttachment(_name, _data) {
         this.removeAttachment(_name);
         this.#attachments[_name] = _data;
+        this.#dirty = true;
         return this;
     }
 
@@ -281,6 +291,7 @@ class MindmapDocument {
             (data instanceof Blob) && data.$url && URL.revokeObjectURL(data.$url);
         }
         this.#attachments = {};
+        this.#dirty = true;
         return this;
     }
 
@@ -294,32 +305,55 @@ class MindmapDocument {
     }
 
     /**
+     * Collect and remove the unused attachments in this document
+     */
+    collectAttachments() {
+        let referencedSet = new Set();
+        const xapPrefix = `${this.env.config.resourceScheme}:`;
+        const xapLen = xapPrefix.length;
+        (this.#sheets instanceof Array) && this.#sheets.forEach(sheet => {
+            for (let item of Topic.enumerateReferenceResource(this.env, sheet.topic)) {
+                String(item).startsWith(xapPrefix) && (item = String(item).substring(xapLen));
+                referencedSet.add(item);
+            }
+        });
+        Object.getOwnPropertyNames(this.#attachments).forEach(item => {
+            if (!referencedSet.has(item)) {
+                this.removeAttachment(item);
+            }
+        });
+    }
+
+    /**
      * Reset the document as a new one.
      * An template sheet will be inserted if the content is empty after calling the callback fucntion.
      * The view assigned to the document will switch to the first sheet automatically after this function.
      * @param {Function} _fn The callback function for preparing the content of the document
      * @param  {...any} _args The arguments passed to the callback function
-     * @returns {MindmapDocument} This object
+     * @returns {Promise<MindmapDocument>} This object
      */
-    newDocument(_fn, ..._args) {
+    async newDocument(_fn, ..._args) {
         this.clearAttachment();
         this.#sheets = [];
-        (typeof _fn === "function") && _fn.apply(this, _args);
+        let ret = (typeof _fn === "function") && _fn.apply(this, _args);
+        (ret instanceof Promise) && await ret;
         (this.#sheets.length <= 0) && (this.#sheets = [cloneObject({id: generateID()}, this.constructor.DefaultSheetTemplate)]);
         this.env.fireEvent("topic-event-sheet-list-changed");
         this.env.fireEvent("topic-event-view-switch-sheet", { sheet: this.#sheets[0] });
+        this.#dirty = false;
         return this;
     }
 
     /**
      * Save the document.
      * Almost as the same as the synchronizeSheetWithView.
-     * @returns {MindmapDocument} This object
+     * @param {Function} _fn Optional. The callback function for saving the document
+     * @returns {Any} The result returned by the callback function
      */
-    saveDocument() {
+    saveDocument(_fn) {
         this.env.fireEvent("topic-event-cancel-edit");
         this.synchronizeSheetWithView();
-        return this;
+        return (typeof _fn === "function") && _fn.apply(this, Array.prototype.slice.call(arguments, 1));
     }
 
     /**
@@ -342,6 +376,22 @@ class MindmapDocument {
     }
 
     /**
+     * Check if the document has been changed
+     */
+    get dirty() {
+        return this.#dirty;
+    }
+
+    /**
+     * Clear the dirty flag of the document
+     * @param {Function} _fn A checker function impelement increasing action.
+     */
+    clearDirtyFlag(_fn) {
+        let rndCode;
+        (typeof _fn === "function") && (_fn(rndCode = parseInt(Math.random() * 100)) === (rndCode + 1)) && (this.#dirty = false);
+    }
+
+    /**
      * Event handler for translating a href to a URL
      * @private
      * @param {Event} _event 
@@ -350,8 +400,9 @@ class MindmapDocument {
         const param = _event.detail;
         if (param) {
             let url = String(param.source);
+            const xapLen = String(this.env.config.resourceScheme || "").length;
             if (url.startsWith(`${this.env.config.resourceScheme}:`)) {
-                url = url.substring(4);
+                url = (param.source = url.substring(xapLen + 1));
                 const data = this.#attachments[url];
                 if (data instanceof Blob) {
                     param.destination = (data.$url || (data.$url = URL.createObjectURL(data)));

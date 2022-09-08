@@ -4,7 +4,7 @@ import { pickFile } from "../../thirdpart/toolkits/src/fileDlgKit";
 
 export function TopicHRefTriggerAction(_eventDetail) {
     const topic = _eventDetail.eventTarget;
-    (topic instanceof Topic) && topic.env.activeLink(topic.env.translateHRefToURL(topic.data.href));
+    (topic instanceof Topic) && topic.env.activeLink(topic.env.translateHRefToURL(topic.data.href).destination);
 }
 
 const TopicHRefEditPanelXML = `
@@ -49,7 +49,7 @@ const TopicHRefEditPanelOptions = {
         "mmap-layout": "line",
         "mmap-layout-margin": "0",
         "mmap-layout-padding": "5",
-        "mmap-layout-background": "generateBackground",
+        "mmap-layout-background": "dialogBubble",
         "mmap-bind-cancel-edit": "",
         "mmap-bind-hide-in-render": "relayout",
         "mmap-bind-filter-edit": "href",
@@ -63,9 +63,6 @@ const TopicHRefEditPanelOptions = {
             inputNode.select();
         }
     },
-    generateBackground() {
-        return MindmapAddinPanel.backgroundGenerator.dialogBubbleBackground(...arguments, {});
-    },
     onAfterLayout(_opt) {
         const panelBox = this.rootNode.getBBox();
         const topicBox = _opt.topic.getGraphicRect();
@@ -78,7 +75,7 @@ const TopicHRefEditPanelOptions = {
             const file = await pickFile();
             if (file instanceof Blob) {
                 const param = {
-                    name: file.name,
+                    name: (_opt.env.config.defaultResourceAttachmentPrefix || "") + file.name,
                     resource: file
                 };
                 _opt.env.fireEvent("topic-event-update-attachment", param);
