@@ -61,6 +61,6 @@ export const topicTaskMarkerTemplate = `
         };
     ]]>
     </script>
-    <use eblock-template="" season-topic-content-type="task-marker" ebevent-rendering="onRendering" />
+    <use eblock-template="" season-topic-content-type="task-marker" ebevent-rendering="onRendering" width="22" height="22" />
 </svg>
 `;

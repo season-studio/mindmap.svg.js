@@ -772,7 +772,14 @@ class Topic extends EBlock {
         const boxNode = topicContentNode.querySelector(".season-topic-box");
         const boxWidth = (_context.contentWidth = _config.padding * 2 + maxWidth);
         const boxHeight = (_context.contentHeight = _config.padding + titleTop);
-        boxNode && (boxNode.setAttribute("width", boxWidth), boxNode.setAttribute("height", boxHeight));
+        if (boxNode) {
+            boxNode.setAttribute("href", `#${_config.topicBoxRefID || "topic-default-box"}`);
+            boxNode.setAttribute("width", boxWidth);
+            boxNode.setAttribute("height", boxHeight);
+            let style = boxNode.style;
+            style.setProperty("--topic-rect-width", `${boxWidth}px`);
+            style.setProperty("--topic-rect-height", `${boxHeight}px`);
+        }
         // render the fold icon
         const childrenNodes = (_context.childrenNodes = this.#getChildrenNods());
         let isFold;

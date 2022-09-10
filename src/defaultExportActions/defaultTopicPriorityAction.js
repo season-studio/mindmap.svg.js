@@ -32,43 +32,43 @@ const TopicPriorityEditPanelXML = `
 <g mmap-layout="line">
     <g class="topic-priority-edit-item season-topic-svg-button" mmap-event-click="selectPriority" d-priority-value="1">
         <rect />
-        <use href="#topic-priority-1" />
+        <use href="#topic-priority-1" width="22" height="22" />
     </g>
     <g class="topic-priority-edit-item season-topic-svg-button" mmap-event-click="selectPriority" d-priority-value="2">
         <rect />
-        <use href="#topic-priority-2" />
+        <use href="#topic-priority-2" width="22" height="22" />
     </g>
     <g class="topic-priority-edit-item season-topic-svg-button" mmap-event-click="selectPriority" d-priority-value="3">
         <rect />
-        <use href="#topic-priority-3" />
+        <use href="#topic-priority-3" width="22" height="22" />
     </g>
     <g class="topic-priority-edit-item season-topic-svg-button" mmap-event-click="selectPriority" d-priority-value="4">
         <rect />
-        <use href="#topic-priority-4" />
+        <use href="#topic-priority-4" width="22" height="22" />
     </g>
 </g>
 <g mmap-layout="line">
     <g class="topic-priority-edit-item season-topic-svg-button" mmap-event-click="selectPriority" d-priority-value="5">
         <rect />
-        <use href="#topic-priority-5" />
+        <use href="#topic-priority-5" width="22" height="22" />
     </g>
     <g class="topic-priority-edit-item season-topic-svg-button" mmap-event-click="selectPriority" d-priority-value="6">
         <rect />
-        <use href="#topic-priority-6" />
+        <use href="#topic-priority-6" width="22" height="22" />
     </g>
     <g class="topic-priority-edit-item season-topic-svg-button" mmap-event-click="selectPriority" d-priority-value="7">
         <rect />
-        <use href="#topic-priority-7" />
+        <use href="#topic-priority-7" width="22" height="22" />
     </g>
     <g class="topic-priority-edit-item season-topic-svg-button" mmap-event-click="selectPriority" d-priority-value="8">
         <rect />
-        <use href="#topic-priority-8" />
+        <use href="#topic-priority-8" width="22" height="22" />
     </g>
 </g>
 <g mmap-layout="line">
     <g class="topic-priority-edit-item season-topic-svg-button" mmap-event-click="selectPriority" d-priority-value="9">
         <rect />
-        <use href="#topic-priority-9" />
+        <use href="#topic-priority-9" width="22" height="22" />
     </g>
     <rect class="topic-priority-placeholder" />
     <rect class="topic-priority-placeholder" />

@@ -19,8 +19,24 @@ const TopicTemplateXML = `
             <rect x="2" y="0" width="2" height="2" fill="#000" stroke="none" />
             <rect x="0" y="2" width="2" height="2" fill="#000" stroke="none" />
         </pattern>
+        <style type="text/css">
+        /* clean-css ignore:start */<![CDATA[/* clean-css ignore:end */
+            .topic-box-inner-rect {
+                width: calc(var(--topic-rect-width) - var(--topic-border-size));
+                height: calc(var(--topic-rect-height) - var(--topic-border-size));
+                /* clean-css ignore:start */x: calc(var(--topic-border-size)/2);/* clean-css ignore:end */
+                /* clean-css ignore:start */y: calc(var(--topic-border-size)/2);/* clean-css ignore:end */
+                stroke-width: var(--topic-border-size);
+                /* clean-css ignore:start */rx: var(--topic-box-radius) !important;/* clean-css ignore:end */
+                /* clean-css ignore:start */ry: var(--topic-box-radius) !important;/* clean-css ignore:end */
+            }
+        /* clean-css ignore:start */]]>/* clean-css ignore:end */
+        </style>
+        <symbol id="topic-default-box" preserveAspectRatio="none">
+            <rect rx="6" ry="6" class="topic-box-inner-rect" pathLength="100"></rect>
+        </symbol>
     </defs>
-    <style eblock-predefined="">
+    <style type="text/css" eblock-predefined="">
     <![CDATA[
             
         .season-topic-drag-group {
@@ -28,8 +44,8 @@ const TopicTemplateXML = `
         }
 
         .season-topic-drag-mask {
-            /* clean-css ignore:start */rx: var(--topic-box-rx, 6px);/* clean-css ignore:end */
-            /* clean-css ignore:start */ry: var(--topic-box-ry, 6px);/* clean-css ignore:end */
+            /* clean-css ignore:start */rx: var(--topic-box-radius, 6px);/* clean-css ignore:end */
+            /* clean-css ignore:start */ry: var(--topic-box-radius, 6px);/* clean-css ignore:end */
             fill: url(#season-topic-drag-mask);
             fill-opacity: 0.3;
             stroke: none;
@@ -64,11 +80,10 @@ const TopicTemplateXML = `
             --topic-border-color: var(--topic-line-color);
             --topic-border-opacity: 0.3;
             --topic-border-size: 0.5px;
-            --topic-border-dasharray: 3,1;
+            --topic-border-dasharray: 1,0.3;
 
             --topic-box-opacity: 0.01;
-            --topic-box-rx: 6px;
-            --topic-box-ry: 6px;
+            --topic-box-radius: 6px;
         }
 
         [season-topic-global] * {
@@ -80,8 +95,6 @@ const TopicTemplateXML = `
         }
 
         .season-topic-box {
-            /* clean-css ignore:start */rx: var(--topic-box-rx);/* clean-css ignore:end */
-            /* clean-css ignore:start */ry: var(--topic-box-ry);/* clean-css ignore:end */
             fill: var(--topic-fill-color);
             fill-opacity: var(--topic-box-opacity);
             stroke: var(--topic-border-color);
@@ -142,7 +155,7 @@ const TopicTemplateXML = `
     <g eblock-template="" season-topic-global="">
         <g season-topic-children-group="" />
         <g season-topic-content-group="" tabindex="0" >
-            <rect class="season-topic-box" />
+            <use class="season-topic-box" />
             <text class="season-topic-title" season-topic-content-type="title" />
             <use class="season-topic-image" season-topic-content-type="image" href="" />
             <g season-topic-extends="" />

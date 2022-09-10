@@ -32,47 +32,47 @@ const TopicTaskMarkerEditPanelXML = `
 <g mmap-layout="line">
     <g class="topic-task-marker-item season-topic-svg-button" mmap-event-click="selectTaskMarker" d-task-marker-value="0">
         <rect />
-        <use href="#topic-task-marker-0" />
+        <use href="#topic-task-marker-0" width="22" height="22" />
     </g>
     <g class="topic-task-marker-item season-topic-svg-button" mmap-event-click="selectTaskMarker" d-task-marker-value="1">
         <rect />
-        <use href="#topic-task-marker-1" />
+        <use href="#topic-task-marker-1" width="22" height="22" />
     </g>
     <g class="topic-task-marker-item season-topic-svg-button" mmap-event-click="selectTaskMarker" d-task-marker-value="2">
         <rect />
-        <use href="#topic-task-marker-2" />
+        <use href="#topic-task-marker-2" width="22" height="22" />
     </g>
     <g class="topic-task-marker-item season-topic-svg-button" mmap-event-click="selectTaskMarker" d-task-marker-value="3">
         <rect />
-        <use href="#topic-task-marker-3" />
+        <use href="#topic-task-marker-3" width="22" height="22" />
     </g>
 </g>
 <g mmap-layout="line">
     <g class="topic-task-marker-item season-topic-svg-button" mmap-event-click="selectTaskMarker" d-task-marker-value="4">
         <rect />
-        <use href="#topic-task-marker-4" />
+        <use href="#topic-task-marker-4" width="22" height="22" />
     </g>
     <g class="topic-task-marker-item season-topic-svg-button" mmap-event-click="selectTaskMarker" d-task-marker-value="5">
         <rect />
-        <use href="#topic-task-marker-5" />
+        <use href="#topic-task-marker-5" width="22" height="22" />
     </g>
     <g class="topic-task-marker-item season-topic-svg-button" mmap-event-click="selectTaskMarker" d-task-marker-value="6">
         <rect />
-        <use href="#topic-task-marker-6" />
+        <use href="#topic-task-marker-6" width="22" height="22" />
     </g>
     <g class="topic-task-marker-item season-topic-svg-button" mmap-event-click="selectTaskMarker" d-task-marker-value="7">
         <rect />
-        <use href="#topic-task-marker-7" />
+        <use href="#topic-task-marker-7" width="22" height="22" />
     </g>
 </g>
 <g mmap-layout="line">
     <g class="topic-task-marker-item season-topic-svg-button" mmap-event-click="selectTaskMarker" d-task-marker-value="8">
         <rect />
-        <use href="#topic-task-marker-8" />
+        <use href="#topic-task-marker-8" width="22" height="22" />
     </g>
     <g class="topic-task-marker-item season-topic-svg-button" mmap-event-click="selectTaskMarker" d-task-marker-value="unknown">
         <rect />
-        <use href="#topic-task-marker-unknown" />
+        <use href="#topic-task-marker-unknown" width="22" height="22" />
     </g>
     <rect class="topic-task-marker-placeholder" />
     <g class="topic-task-marker-item season-topic-svg-button" d-svg-button-danger="" mmap-event-click="deleteTaskMarker">

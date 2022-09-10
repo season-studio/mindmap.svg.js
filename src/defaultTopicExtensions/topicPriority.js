@@ -49,6 +49,6 @@ export const topicPriorityTemplate = `
         };
     ]]>
     </script>
-    <use eblock-template="" season-topic-content-type="priority" ebevent-rendering="onRendering" />
+    <use eblock-template="" season-topic-content-type="priority" ebevent-rendering="onRendering" width="22" height="22" />
 </svg>
 `;

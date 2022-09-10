@@ -47,7 +47,7 @@ export const topicHRefTemplate = `
     </script>
     <g eblock-template="" season-topic-content-type="href" class="season-topic-href" ebevent-rendering="onRendering">
         <rect width="20" height="20" rx="3" ry="3" />
-        <use href="#topic-href-link-icon" />
+        <use href="#topic-href-link-icon" width="20" height="20" />
     </g>
 </svg>
 `;
