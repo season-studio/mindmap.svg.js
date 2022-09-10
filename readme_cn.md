@@ -138,6 +138,16 @@ TopicExtensionFactor模板的具体实例，可以参考[常见扩展元素的�
 扩展主题元素的编辑动作主要通过响应MindmapEnvironment中的topic-event-trigger和topic-event-edit两个消息来实现。前者是鼠标单击元素时的触发事件，后者是鼠标双击元素时的触发事件。这两个事件的具体参数说明请参考API文档。
 扩展主题元素编辑动作的具体实例，可以参考[常见扩展元素的实现](./src/defaultExportActions/)。
 
+## 发布记录
+
+### 1.0.2
+- 允许自定义Topic背景框的形状
+- 增强对Safari浏览器的兼容性
+
+### 1.0.0
+
+- Initial release of mindmap.svg.js
+
 ## API说明
 请参考[API文档](./doc/api.md)
 

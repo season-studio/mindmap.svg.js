@@ -779,6 +779,7 @@ class Topic extends EBlock {
             let style = boxNode.style;
             style.setProperty("--topic-rect-width", `${boxWidth}px`);
             style.setProperty("--topic-rect-height", `${boxHeight}px`);
+            style.setProperty("--topic-title-top", `${titleTop}px`);
         }
         // render the fold icon
         const childrenNodes = (_context.childrenNodes = this.#getChildrenNods());

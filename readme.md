@@ -138,6 +138,16 @@ See [Default Topic Extensions](./src/defaultTopicExtensions/) for the example of
 
 The extension should listen the event "topic-event-trigger" and "topic-event-edit" in MindmapEnvironment for providing the editing action. See [Default Topic Actions](./src/defaultExportActions/) for the example of the implementation of the actions. See [API Document](./doc/api.md) for more information of the event.
 
+## Release Notes
+
+### 1.0.2
+- Enable customize the shape of the topic box
+- Enhance compatibility in Safari
+
+### 1.0.0
+
+- Initial release of mindmap.svg.js
+
 ## API Reference
 See [API Document](./doc/api.md) for more information.
 
