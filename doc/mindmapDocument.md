@@ -33,8 +33,8 @@ Class of document model describing the mindmap
     * [.hasAttachment(_name)](#MindmapDocument+hasAttachment) ⇒ <code>Boolean</code>
     * [.collectAttachments()](#MindmapDocument+collectAttachments)
     * [.newDocument(_fn, ..._args)](#MindmapDocument+newDocument) ⇒ [<code>Promise.&lt;MindmapDocument&gt;</code>](#MindmapDocument)
-    * [.saveDocument(_fn)](#MindmapDocument+saveDocument) ⇒ <code>Any</code>
-    * [.getThumbImage(_toBlob)](#MindmapDocument+getThumbImage) ⇒ <code>Promise.&lt;(String\|Blob)&gt;</code>
+    * [.saveDocument(_fn, _keepWorkState)](#MindmapDocument+saveDocument) ⇒ <code>Any</code>
+    * [.getThumbImage(_toBlob, _keepWorkState)](#MindmapDocument+getThumbImage) ⇒ <code>Promise.&lt;(String\|Blob)&gt;</code>
     * [.dispose()](#MindmapDocument+dispose)
     * [.clearDirtyFlag(_fn)](#MindmapDocument+clearDirtyFlag)
 
@@ -229,7 +229,7 @@ Reset the document as a new one.An template sheet will be inserted if the conte
 
 <a name="MindmapDocument+saveDocument"></a>
 
-### mindmapDocument.saveDocument(_fn) ⇒ <code>Any</code>
+### mindmapDocument.saveDocument(_fn, _keepWorkState) ⇒ <code>Any</code>
 Save the document.Almost as the same as the synchronizeSheetWithView.
 
 **Kind**: instance method of [<code>MindmapDocument</code>](#MindmapDocument)  
@@ -238,10 +238,11 @@ Save the document.Almost as the same as the synchronizeSheetWithView.
 | Param | Type | Description |
 | --- | --- | --- |
 | _fn | <code>function</code> | Optional. The callback function for saving the document |
+| _keepWorkState | <code>Boolean</code> | Optional. If this argument is set to true, the working element such as editbox will keep in alive during saving |
 
 <a name="MindmapDocument+getThumbImage"></a>
 
-### mindmapDocument.getThumbImage(_toBlob) ⇒ <code>Promise.&lt;(String\|Blob)&gt;</code>
+### mindmapDocument.getThumbImage(_toBlob, _keepWorkState) ⇒ <code>Promise.&lt;(String\|Blob)&gt;</code>
 Generate the thumb image of the current view of the document
 
 **Kind**: instance method of [<code>MindmapDocument</code>](#MindmapDocument)  
@@ -250,6 +251,7 @@ Generate the thumb image of the current view of the document
 | Param | Type | Description |
 | --- | --- | --- |
 | _toBlob | <code>Boolean</code> | Optional. Set true if the thumb image is strored as a blob |
+| _keepWorkState | <code>Boolean</code> | Optional. If this argument is set to true, the working element such as editbox will keep in alive during gettig the thumb |
 
 <a name="MindmapDocument+dispose"></a>
 

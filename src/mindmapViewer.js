@@ -301,9 +301,9 @@ class MindmapViewer extends MindmapContainer {
      */
     exportImage(_opt) {
         _opt || (_opt = {});
-        this.env.fireEvent("topic-event-cancel-edit");
+        _opt.keepWorkState || this.env.fireEvent("topic-event-cancel-edit");
         let focusTopic = this.focusTopic;
-        focusTopic && focusTopic.killFocus();
+        focusTopic && !_opt.keepWorkState && focusTopic.killFocus();
         const { x, y, width, height } = this.stageContainer.getBBox();
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
@@ -315,7 +315,7 @@ class MindmapViewer extends MindmapContainer {
         svg.insertAdjacentHTML("afterbegin", this.svgElement.innerHTML);
         const serializer = new XMLSerializer();
         const source = '<?xml version="1.0" standalone="no"?>\r\n' + serializer.serializeToString(svg);
-        focusTopic && focusTopic.setFocus();
+        focusTopic && !_opt.keepWorkState && focusTopic.setFocus();
         return this.env.getImageData("data:image/svg+xml;charset=utf-8," + encodeURIComponent(source), Object.assign({}, _opt, {
             width, 
             height

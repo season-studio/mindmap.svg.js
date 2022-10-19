@@ -781,6 +781,9 @@ class Topic extends EBlock {
             style.setProperty("--topic-rect-height", `${boxHeight}px`);
             style.setProperty("--topic-title-top", `${titleTop}px`);
         }
+        topicContentNode.setAttribute("d-topic-rect-width", boxWidth);
+        topicContentNode.setAttribute("d-topic-rect-height", boxHeight);
+
         // render the fold icon
         const childrenNodes = (_context.childrenNodes = this.#getChildrenNods());
         let isFold;
@@ -1090,8 +1093,21 @@ class Topic extends EBlock {
         let node = (_type ? this.#topicContentNode.querySelector(_type)
                           : (this.#topicContentNode.querySelector(".season-topic-box") || this.#topicContentNode));
         let rect = node && node.getBoundingClientRect();
-
-        return rect || new DOMRect();
+        if (rect)
+        {
+            if (!_type || (_type === ".season-topic-box"))
+            {
+                let width = Number(this.#topicContentNode.getAttribute("d-topic-rect-width"));
+                let height = Number(this.#topicContentNode.getAttribute("d-topic-rect-height"));
+                width && (rect.width = width);
+                height && (rect.height = height);
+            }
+            return rect;
+        }
+        else
+        {
+            return new DOMRect();
+        }
     }
 
     /**
@@ -1103,8 +1119,21 @@ class Topic extends EBlock {
         let node = (_type ? this.#topicContentNode.querySelector(_type)
                           : (this.#topicContentNode.querySelector(".season-topic-box") || this.#topicContentNode));
         let box = (node instanceof SVGGraphicsElement) && node.getBBox();
-
-        return box || {x:0,y:0,width:0,height:0};
+        if (box)
+        {
+            if (!_type || (_type === ".season-topic-box"))
+            {
+                let width = Number(this.#topicContentNode.getAttribute("d-topic-rect-width"));
+                let height = Number(this.#topicContentNode.getAttribute("d-topic-rect-height"));
+                width && (box.width = width);
+                height && (box.height = height);
+            }
+            return box;
+        }
+        else
+        {
+            return {x:0,y:0,width:0,height:0};
+        }
     }
 
     /**
@@ -1122,7 +1151,17 @@ class Topic extends EBlock {
             const svgCTM = this.#topicContentNode.ownerSVGElement.getScreenCTM().inverse();
             const { e:x, f:y } = svgCTM.translate(ctm.e, ctm.f);
             let { e:width, f:height} = ctm.translate(bbox.width, bbox.height);
-            width -= ctm.e, height -= ctm.f;
+            if (ctm && (!_type || (_type === ".season-topic-box")))
+            {
+                let n = Number(this.#topicContentNode.getAttribute("d-topic-rect-width"));
+                n && (width = n);
+                n = Number(this.#topicContentNode.getAttribute("d-topic-rect-height"));
+                n && (height = n);
+            }
+            else
+            {
+                width -= ctm.e, height -= ctm.f;
+            }
             return { x, y, width, height };
         } else {
             return { x: 0, y: 0, width: 0, height: 0 };
@@ -1138,7 +1177,6 @@ class Topic extends EBlock {
         let node = (_type ? this.#topicContentNode.querySelector(_type)
                           : (this.#topicContentNode.querySelector(".season-topic-box") || this.#topicContentNode));
         let ctm = (node instanceof SVGGraphicsElement) && (node.getCTM() || node.getScreenCTM());
-
         return ctm || new DOMMatrix([1, 0, 0, 1, 0, 0]);
     }
 
@@ -1156,7 +1194,16 @@ class Topic extends EBlock {
             let bbox = node.getBBox();
             let pt = ctm.translate(bbox.x, bbox.y);
             let et = ctm.translate(bbox.x + bbox.width, bbox.y + bbox.height);
-            return { x: pt.e, y: pt.f, width: et.e - pt.e, height: et.f - pt.f };
+            if (_type && (_type !== ".season-topic-box"))
+            {
+                return { x: pt.e, y: pt.f, width: et.e - pt.e, height: et.f - pt.f };
+            }
+            else
+            {
+                let width = Number(this.#topicContentNode.getAttribute("d-topic-rect-width"));
+                let height = Number(this.#topicContentNode.getAttribute("d-topic-rect-height"));
+                return { x: pt.e, y: pt.f, width: width || (et.e - pt.e), height: height || (et.f - pt.f) };
+            }
         } else {
             return { x: 0, y: 0, width: 0, height: 0 };
         }
@@ -1168,7 +1215,11 @@ class Topic extends EBlock {
      */
     getGlobalRect() {
         const rootNode = this.#getMindRootNode();
-        return rootNode ? rootNode.getBBox() : {x:0, y:0, width:0, height:0};
+        const rect = rootNode ? rootNode.getBBox() : {x:0, y:0, width:0, height:0};
+        let n = Number(this.#topicContentNode.getAttribute("d-topic-rect-width"));
+        n && (rect.width = n);
+        n = Number(this.#topicContentNode.getAttribute("d-topic-rect-height"));
+        n && (rect.height = n);
     }
 
     /**

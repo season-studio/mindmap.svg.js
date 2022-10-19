@@ -348,10 +348,11 @@ class MindmapDocument {
      * Save the document.
      * Almost as the same as the synchronizeSheetWithView.
      * @param {Function} _fn Optional. The callback function for saving the document
+     * @param {Boolean} _keepWorkState Optional. If this argument is set to true, the working element such as editbox will keep in alive during saving
      * @returns {Any} The result returned by the callback function
      */
-    saveDocument(_fn) {
-        this.env.fireEvent("topic-event-cancel-edit");
+    saveDocument(_fn, _keepWorkState) {
+        _keepWorkState || this.env.fireEvent("topic-event-cancel-edit");
         this.synchronizeSheetWithView();
         return (typeof _fn === "function") && _fn.apply(this, Array.prototype.slice.call(arguments, 1));
     }
@@ -359,10 +360,11 @@ class MindmapDocument {
     /**
      * Generate the thumb image of the current view of the document
      * @param {Boolean} _toBlob Optional. Set true if the thumb image is strored as a blob
+     * @param {Boolean} _keepWorkState Optional. If this argument is set to true, the working element such as editbox will keep in alive during gettig the thumb
      * @returns {Promise<String|Blob>} A promise that will resolve with the thumb image.
      */
-    getThumbImage(_toBlob) {
-        this.env.fireEvent("topic-event-cancel-edit");
+    getThumbImage(_toBlob, _keepWorkState) {
+        _keepWorkState || this.env.fireEvent("topic-event-cancel-edit");
         const param = { image: undefined, option: { toBlob: (_toBlob || false) } };
         this.env.fireEvent("topic-event-view-export-image", param);
         return param.image instanceof Promise ? param.image : Promise.resolve(param.image);
