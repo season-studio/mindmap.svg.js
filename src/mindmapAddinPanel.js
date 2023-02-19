@@ -244,7 +244,7 @@ export function MindmapAddinPanel(_parentNode, _content, _opt) {
                 }
             });
         } catch (_err) {
-            _err && console.warn("Fail in processing dblclick event in MindmapAddinPanel", _err);
+            _err && console.warn("Fail in processing keydown event in MindmapAddinPanel", _err);
         } finally {
             _event.stopPropagation();
         }

@@ -140,6 +140,13 @@ The extension should listen the event "topic-event-trigger" and "topic-event-edi
 
 ## Release Notes
 
+### 1.0.4
+- Fix the bug that user can not select text in editor box by mouse.
+- Fix the incorrect tip when some exception raised in keydown event.
+- Change the default margin value of the topics.
+- Change the storage of the customer configuration's logger.
+- Add the backgound color into the configuration of the environment.
+
 ### 1.0.2
 - Enable customize the shape of the topic box
 - Enhance compatibility in Safari

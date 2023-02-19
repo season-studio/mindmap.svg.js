@@ -38,10 +38,10 @@ class MindmapEnvironment extends EventTarget {
     static DefaultConfig = Object.freeze({
         padding: 10,
         secondaryPadding: 5,
-        levelMargin: 46,
-        secondaryLevelMargin: 26,
-        siblingMargin: 26,
-        secondarySiblingMargin: 17,
+        levelMargin: 26,
+        secondaryLevelMargin: 17,
+        siblingMargin: 10,
+        secondarySiblingMargin: 6,
         secondaryTopicLevel: 2,
         suitableTitleLineWidth: 120,
         directionPriority: "right",
@@ -49,7 +49,8 @@ class MindmapEnvironment extends EventTarget {
         dragStartNoFocusFilterTimer: 100,
         resourceScheme: "xap",
         defaultResourceAttachmentPrefix: "resources/",
-        placeholderImageId: "season-topic-predefine-image-picture-placeholder"
+        placeholderImageId: "season-topic-predefine-image-picture-placeholder",
+        backgroundColor: "transparent"
     });
 
     #extensionFactors = [];

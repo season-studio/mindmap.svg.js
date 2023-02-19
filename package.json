@@ -1,6 +1,6 @@
 {
   "name": "mindmap.svg.js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "components for displaying and operating mindmap in webview",
   "main": ".dist/index.js",
   "files": [

@@ -748,7 +748,7 @@ class Topic extends EBlock {
         let titleAndExtendWidth = titleWidth + ((extendsWidth > 0) ? (_config.padding + extendsWidth) : 0);
         let maxWidth;
         const suitableTitleLineWidth = (Number(_config.suitableTitleLineWidth) || MindmapEnvironment.DefaultConfig.suitableTitleLineWidth);
-        if ((titleAndExtendWidth > imageWidth) && (titleWidth > suitableTitleLineWidth || extendsWidth > suitableTitleLineWidth) && (extendsWidth > titleWidth)) {
+        if ((titleAndExtendWidth > imageWidth) && (titleWidth > suitableTitleLineWidth || extendsWidth > suitableTitleLineWidth)) { // && (extendsWidth > titleWidth)) {
             // the title + extends line is too long, so split them to two lines
             maxWidth = Math.max(titleWidth, imageWidth, extendsWidth);
             titleNode.setAttribute("transform", `translate(${(titleWidth >= maxWidth) ? _config.padding : (_config.padding + (maxWidth - titleWidth) / 2)}, ${titleTop})`);

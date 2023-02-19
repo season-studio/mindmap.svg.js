@@ -18,6 +18,8 @@ const ContainerDefXml = `
         --topic-ui-danger-color: #f22;
         --topic-ui-emphasize-front-color: #fff;
         --topic-ui-hover-back-color: #ccc;
+
+        background-color: var(--background-color, transparent);
         
         -webkit-touch-callout: none; /* iOS Safari */
         -webkit-user-select: none; /* Chrome/Safari/Opera */

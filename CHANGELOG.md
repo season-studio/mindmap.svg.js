@@ -4,6 +4,19 @@ All notable changes to the "mindmap.svg.js" will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.4] - 2023-02-19
+
+### Changed
+
+- Fix the bug that user can not select text in editor box by mouse.
+- Fix the incorrect tip when some exception raised in keydown event.
+- Change the default margin value of the topics.
+- Change the storage of the customer configuration's logger.
+
+### Added
+
+- Add the backgound color into the configuration of the environment.
+
 ## [1.0.3] - 2022-10-19
 
 ### Changed

@@ -13,6 +13,8 @@ import { Topic } from "./topic";
 import { TopicFactor } from "./topicFactor";
 import { registerInstanceEventHandler, unregisterInstanceEventHandler } from "./miscUtilities";
 
+const SymbolCustomPropsLog = Symbol("mindmap.svg.js.custom.props.log");
+
 export
 /**
  * Class of the viewer for displaying and operating the mindmap
@@ -357,12 +359,12 @@ class MindmapViewer extends MindmapContainer {
         try {
             let detail = _event && _event.detail;
             const style = this.svgElement.style;
-            let oldProperties = String(this.svgElement.getAttribute("d-custom-style-props") || "").trim();
-            oldProperties && oldProperties.split(";").forEach(item => {
+            let oldProperties = this.svgElement[SymbolCustomPropsLog] || [];
+            oldProperties.forEach(item => {
                 item = item.trim();
                 item && style.removeProperty(item);
             });
-            this.svgElement.removeAttribute("d-custom-style-props");
+            this.svgElement[SymbolCustomPropsLog] = undefined;
             if (detail) {
                 let propNames = [];
                 Object.entries(detail).forEach(item => {
@@ -370,7 +372,7 @@ class MindmapViewer extends MindmapContainer {
                     propNames.push(name);
                     style.setProperty(name, item[1]);
                 });
-                (propNames.length > 0) && this.svgElement.setAttribute("d-custom-style-props", propNames.join(";"));
+                (propNames.length > 0) && (this.svgElement[SymbolCustomPropsLog] = propNames);
             }
         } catch (err) {
             this.env.warn("Exception raised in update parameters as the svg custom style value", err);
@@ -551,9 +553,9 @@ class MindmapViewer extends MindmapContainer {
                     uiCtrlContext.y = _event.clientY;
                     let ctp = Topic.convertWindowPointToGraphic(this.svgElement, deltaX, deltaY);
                     this.move(ctp.x, ctp.y);
+                    _event.preventDefault();
+                    _event.stopPropagation();
                 }
-                _event.preventDefault();
-                _event.stopPropagation();
             } else {
                 uiCtrlContext.type = null;
                 this.svgElement.style.cursor = "";
