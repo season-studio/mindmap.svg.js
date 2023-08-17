@@ -18,6 +18,8 @@ const TOPIC_LEVEL = Symbol("topic.level");
 const TOPIC_DIRECTION = Symbol("topic.direction");
 const TOPIC_FOLD = Symbol("topic.fold");
 
+const TitleMeasureCanvasMap = new WeakMap();
+
 export
 /**
  * Class of the topic
@@ -349,11 +351,111 @@ class Topic extends EBlock {
     }
 
     #renderTopic() {
-        let args = Array.prototype.splice.call(arguments, 0);
+        let args = Array.prototype.slice.call(arguments, 0);
         args[2] || (args[2] = this.env.config);
         EBlock.prototype.render.apply(this, args);
         return this;
     }
+
+    * #splitTitleText(_title, _textNode, _maxWidth) {
+        if (_title = (_title && String(_title).trim())) {
+            let canvas = TitleMeasureCanvasMap.get(this.env);
+            (!canvas) && TitleMeasureCanvasMap.set(this.env, canvas = document.createElement("canvas"));
+            const context2d = canvas?.getContext("2d");
+            if (context2d) {
+                let textStyles = getComputedStyle(_textNode);
+                context2d.font = textStyles.font;
+                const spaceWidth = context2d.measureText("\u00A0").width;
+                for (let titleLine of _title.split(/\r?\n/)) {
+                    let textLen = context2d.measureText(titleLine)?.width;
+                    if (textLen <= _maxWidth) {
+                        // the text is matched to the max width, return it directly
+                        yield titleLine;
+                    } else {
+                        // the text is wilder than the max width, split it into multi-line
+                        let titleWords = titleLine.split(/\s/).map(e => { return { text: e, width: context2d.measureText(e)?.width||0 } });
+                        let cacheText = "";
+                        let cacheWidth = 0;
+                        for (let word of titleWords) {
+                            if (word.width >= _maxWidth) {
+                                // the word is wilder than the max width, return the text in the cache first, then split the current word into multi-line 
+                                if (cacheWidth) {
+                                    yield cacheText;
+                                }
+                                cacheText = "";
+                                cacheWidth = 0;
+                                if (word.width === _maxWidth) {
+                                    // the word is matched to the max width return it directly
+                                    yield word.text;
+                                } else {
+                                    // the word is wilder than the max width, spliting it into multi-line
+                                    let subTotalText = word.text;
+                                    let subTotalWidth = word.width;
+                                    do {
+                                        let subTotalLen = subTotalText.length;
+                                        if (subTotalLen === 1) {
+                                            yield subTotalText;
+                                            subTotalText = "";
+                                        } else {
+                                            // find a sub string which's width is not less than the max width
+                                            let subPos = parseInt(subTotalLen * _maxWidth / subTotalWidth);
+                                            let subText = subTotalText.substring(0, subPos);
+                                            let subWidth = context2d.measureText(subText).width;
+                                            while ((subPos < subTotalLen) && (subWidth < _maxWidth)) {
+                                                subPos += (parseInt((_maxWidth - subWidth) / (subTotalWidth - subWidth)) || 1);
+                                                subText = subTotalText.substring(0, subPos);
+                                                subWidth = context2d.measureText(subText).width;
+                                            }
+                                            if (subWidth === _maxWidth) {
+                                                // if the sub string is matched to the max width, return it directly
+                                                yield subText;
+                                            } else {
+                                                // cut down the sub string let it's width is less than the max width
+                                                while ((subWidth > _maxWidth) && (subPos > 1)) {
+                                                    subText = subTotalText.substring(0, --subPos);
+                                                    subWidth = context2d.measureText(subText).width;
+                                                }
+                                                if (subPos < subTotalLen) {
+                                                    yield subText;
+                                                    subTotalText = subTotalText.substring(subPos);
+                                                    subTotalWidth -= subWidth;
+                                                } else {
+                                                    cacheText = subTotalText;
+                                                    cacheWidth = subTotalWidth;
+                                                    subTotalText = "";
+                                                }
+                                            }
+                                        }
+                                    } while(subTotalText);
+                                }
+                            } else {
+                                // if the word is not wilder than the max width, try to combine the words in cache, 
+                                // and return the cache when it's width is near to the max width
+                                cacheWidth = (cacheWidth ? (cacheWidth + spaceWidth + word.width) : word.width);
+                                if (cacheWidth > _maxWidth) {
+                                    yield cacheText;
+                                    cacheText = word.text;
+                                    cacheWidth = word.width;
+                                } else {
+                                    cacheText = (cacheText ? (cacheText + "\u00A0" + word.text) : word.text);
+                                    if (cacheWidth === _maxWidth) {
+                                        yield cacheText;
+                                        cacheText = "";
+                                        cacheWidth = 0;
+                                    }
+                                }
+                            }
+                        }
+                        // return the text remained in the cache
+                        if (cacheText) {
+                            yield cacheText;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     //#endregion
 
     //#region public members
@@ -710,12 +812,33 @@ class Topic extends EBlock {
         this.$assignedNode.setAttribute("season-topic-global", _data.id);
         this.$assignedNode.setAttribute("d-topic-level", curLevel);
         (curLevel > 0) && (this[TOPIC_DIRECTION] = _direction);
-        // render the content of the title
         const topicContentNode = this.#topicContentNode;
         topicContentNode.setAttribute("d-topic-id", _data.id);
         topicContentNode.setAttribute("d-topic-level", curLevel);
+        const topicContentComputedStyles = getComputedStyle(topicContentNode);
+        // calculating the suitable width of the line
+        const suitableLineWidth = Math.max((Number(_data.image?.width)||0), 
+            (Number(_data.customWidth) || Number(Object(/^\d+/ig.exec(topicContentComputedStyles?.maxWidth))[0]) || Number(_config.maxTopicLineWidth) || MindmapEnvironment.DefaultConfig.maxTopicLineWidth));
+        // render the content of the title
         const titleNode = topicContentNode.querySelector(".season-topic-title");
-        titleNode && ((titleNode.textContent = _data.title) || (titleNode.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"));
+        if (titleNode) {
+            titleNode.innerHTML = "";
+            let tspanList = [];
+            for (let titleLine of this.#splitTitleText(_data.title, titleNode, suitableLineWidth)) {
+                let tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+                if (tspan) {
+                    tspan.textContent = titleLine;
+                    tspan.setAttribute("x", "0");
+                    (tspanList.length > 0) && tspan.setAttribute("dy", "1.1em");
+                }
+                tspanList.push(tspan);
+            }
+            if (tspanList.length > 0) {
+                titleNode.append(...tspanList);
+            } else {
+                titleNode.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            }
+        }
         const { width:titleWidth, height:titleHeight } = titleNode.getBBox();
         // render the extends
         const extendsNode = topicContentNode.querySelector("[season-topic-extends]");
@@ -726,8 +849,8 @@ class Topic extends EBlock {
         let imageWidth = 0, imageHeight = 0, topicImageNode;
         const imageRes = _data.image && this.env.translateHRefToURL(_data.image.src);
         if (imageRes) {
-            topicImageNode = this.acquireNode(":scope > [season-topic-content-group] > .season-topic-image", this.#topicContentNode, "beforeend");
-            imageWidth = (Number(_data.image.width) || Math.max(titleWidth, Number(_config.suitableTitleLineWidth) || MindmapEnvironment.DefaultConfig.suitableTitleLineWidth));
+            topicImageNode = this.acquireNode(":scope > [season-topic-content-group] > .season-topic-image", topicContentNode, "beforeend");
+            imageWidth = (Number(_data.image.width) || suitableLineWidth);
             imageHeight = (Number(_data.image.height) || 0);
             imageHeight || (imageHeight = imageWidth / 4 * 3);
             if (topicImageNode) {
@@ -747,8 +870,7 @@ class Topic extends EBlock {
         // locate the content
         let titleAndExtendWidth = titleWidth + ((extendsWidth > 0) ? (_config.padding + extendsWidth) : 0);
         let maxWidth;
-        const suitableTitleLineWidth = (Number(_config.suitableTitleLineWidth) || MindmapEnvironment.DefaultConfig.suitableTitleLineWidth);
-        if ((titleAndExtendWidth > imageWidth) && (titleWidth > suitableTitleLineWidth || extendsWidth > suitableTitleLineWidth)) { // && (extendsWidth > titleWidth)) {
+        if (titleAndExtendWidth > suitableLineWidth) {
             // the title + extends line is too long, so split them to two lines
             maxWidth = Math.max(titleWidth, imageWidth, extendsWidth);
             titleNode.setAttribute("transform", `translate(${(titleWidth >= maxWidth) ? _config.padding : (_config.padding + (maxWidth - titleWidth) / 2)}, ${titleTop})`);
@@ -765,8 +887,13 @@ class Topic extends EBlock {
                 maxWidth = titleAndExtendWidth;
             }
             titleNode.setAttribute("transform", `translate(${centerPadding}, ${titleTop})`);
-            extendsNode.setAttribute("transform", `translate(${centerPadding + _config.padding + titleWidth}, ${titleTop})`);
-            titleTop += Math.max(titleHeight, extendsHeight);
+            if (titleHeight >= extendsHeight) {
+                extendsNode.setAttribute("transform", `translate(${centerPadding + _config.padding + titleWidth}, ${titleTop + (titleHeight - extendsHeight) / 2})`);
+                titleTop += titleHeight;
+            } else {
+                extendsNode.setAttribute("transform", `translate(${centerPadding + _config.padding + titleWidth}, ${titleTop})`);
+                titleTop += extendsHeight;
+            }
         }
         topicImageNode && topicImageNode.setAttribute("transform", `translate(${(imageWidth >= maxWidth) ? _config.padding : (_config.padding + ((maxWidth - imageWidth) / 2))}, ${_config.padding})`);
         const boxNode = topicContentNode.querySelector(".season-topic-box");
@@ -802,6 +929,15 @@ class Topic extends EBlock {
             const topicFoldNode = this.acquireNode(':scope > [season-topic-content-group] > [season-topic-content-type="fold"]');
             topicFoldNode && topicFoldNode.remove();
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        // invoke the extend rendering functions
+        this.env.fireEvent("topic-rendering-extend", {
+            topic: this,
+            context: _context,
+            limitLevel: _limitLevel,
+            direction: _direction
+        });
 
         ///////////////////////////////////////////////////////////////////////
         // triger rendering the children topics

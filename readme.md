@@ -140,6 +140,11 @@ The extension should listen the event "topic-event-trigger" and "topic-event-edi
 
 ## Release Notes
 
+### 1.0.6
+- Let the title of the topic can be break into multi-line
+- Add the "topic-rendering-extend" event into the environment to perform the extending rendering function
+- Remove the parameter named "suitableLineWidth", add parameter named "maxTopicLineWidth"
+
 ### 1.0.4
 - Fix the bug that user can not select text in editor box by mouse.
 - Fix the incorrect tip when some exception raised in keydown event.

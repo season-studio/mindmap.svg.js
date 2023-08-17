@@ -92,6 +92,7 @@ const TopicTemplateXML = `
 
         [season-topic-content-group] {
             font-size: var(--topic-font-size);
+            max-width: calc(1px * var(--suitable-title-line-width));
         }
 
         .season-topic-box {

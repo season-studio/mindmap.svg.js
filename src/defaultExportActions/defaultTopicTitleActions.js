@@ -13,9 +13,11 @@ const TopicTitleEditorTemplate = `
             height: 100%;
             color: #000;
             background-color: #fff;
+            resize: none;
+            overflow: hidden;
         }
     </style>
-    <input xmlns="http://www.w3.org/1999/xhtml" class="season-topic-title-editor" tabindex="0" mmap-event-keydown="onKeydown"></input>
+    <textarea xmlns="http://www.w3.org/1999/xhtml" class="season-topic-title-editor" tabindex="0" mmap-event-keydown="onKeydown"></textarea>
 </foreignObject>
 `;
 
@@ -49,7 +51,7 @@ const TopicTitleEditorPanelOptions = {
     },
     onAfterLayout(_opt) {
         const config = this.topic.env.config;
-        const padding = (Number(config.secondaryPadding) || 5);
+        const padding = (Number(config.padding) || 7) - 2;
 
         this.inputNode.value = String(this.topic.data.title || "").trim();
         this.inputNode.style.padding = (this.inputNode.style.borderRadius = `${padding}px`);
@@ -65,10 +67,7 @@ const TopicTitleEditorPanelOptions = {
         
         const titleNode = this.topic.$assignedNode.querySelector(":scope > [season-topic-content-group] > .season-topic-title");
         const titleNodeStyle = getComputedStyle(titleNode);
-        if (titleNodeStyle) {
-            this.inputNode.style.fontSize = titleNodeStyle["font-size"];
-            this.inputNode.style.fontWeight = titleNodeStyle["font-weight"];
-        }
+        titleNodeStyle && (this.inputNode.style.font = titleNodeStyle.font);
 
         this.topic.queueAction(() => {
             this.inputNode.focus();
@@ -77,7 +76,7 @@ const TopicTitleEditorPanelOptions = {
     },
     onKeydown(_event, _node, _opt) {
         let key = String(_event.key).toLowerCase();
-        if (key === "enter") {
+        if ((key === "enter") && (!_event.shiftKey)) {
             key = undefined;
             this.onSubmit();
             this.close();

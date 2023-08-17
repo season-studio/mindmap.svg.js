@@ -140,6 +140,11 @@ TopicExtensionFactor模板的具体实例，可以参考[常见扩展元素的�
 
 ## 发布记录
 
+### 1.0.6
+- 增加主题标题可以拆分成多行的支持
+- 在Environment中增加topic-rendering-extend事件，用以支持扩展渲染处理
+- 删除了suitableLineWidth参数，增加maxTopicLineWidth参数
+
 ### 1.0.4
 - 修复编辑框中无法用鼠标进行内容选择的BUG
 - 修复keydown事件中发生异常时的提示文字的错误

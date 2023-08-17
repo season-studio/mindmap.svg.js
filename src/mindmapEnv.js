@@ -26,7 +26,7 @@ class MindmapEnvironment extends EventTarget {
      * @property {Number} siblingMargin The margin during the children of the first kind topic
      * @property {Number} secondarySiblingMargin The margin during the children of the secondary kind topic
      * @property {Number} secondaryTopicLevel The level to distinguish the secondary kind topic from the first kind topic
-     * @property {Number} suitableTitleLineWidth The suitable width of the title line of the topic. If the total width the title and the extension is larger then this value, the renderer will try to break them into two line
+     * @property {Number} maxTopicLineWidth The max width of the topic line
      * @property {String} directionPriority Special the primary side to layout the children of the first topic. The avaliable value is "left" or "right"
      * @property {Number} dragStartFocusFilterTimer The time to wake up the drag-drop action after mousedown in the focus topic
      * @property {Number} dragStartNoFocusFilterTimer The time to wake up the drag-drop action after mousedown in the nofocus topic
@@ -43,7 +43,7 @@ class MindmapEnvironment extends EventTarget {
         siblingMargin: 10,
         secondarySiblingMargin: 6,
         secondaryTopicLevel: 2,
-        suitableTitleLineWidth: 120,
+        maxTopicLineWidth: 120,
         directionPriority: "right",
         dragStartFocusFilterTimer: 50,
         dragStartNoFocusFilterTimer: 100,

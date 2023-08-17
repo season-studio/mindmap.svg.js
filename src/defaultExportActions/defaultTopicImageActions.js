@@ -23,7 +23,9 @@ async function changeTopicImage(_topic) {
             } else {
                 const config = _topic.env.config;
                 const topicWidth = _topic.getRect().width - (config.padding * 2);
-                const suitableWidth = Math.max(topicWidth, Number(config.suitableTitleLineWidth) || MindmapEnvironment.DefaultConfig.suitableTitleLineWidth);
+                const topicContentNode = _topic.$assignedNode.querySelector(":scope > [season-topic-content-group]");
+                const topicContentComputedStyles = getComputedStyle(topicContentNode);
+                const suitableWidth = Math.max(topicWidth, (Number(_topic.data.customWidth) || Number(Object(/^\d+/ig.exec(topicContentComputedStyles?.maxWidth))[0]) || Number(config.maxTopicLineWidth) || MindmapEnvironment.DefaultConfig.maxTopicLineWidth));
                 const imageObj = new Image();
                 imageObj.src = URL.createObjectURL(file);
                 await imageObj.decode();
@@ -139,8 +141,7 @@ const topicImageTriggerToolbarTemplate = `
 function setupTopicImageTrigger(_topic, _triggerNode, _toolbarNode) {
     const imageNode = _topic.$assignedNode.querySelector(":scope > [season-topic-content-group] > .season-topic-image");
     if (_topic.data.image && imageNode) {
-        const padding = _topic.env.config.padding;
-        const secondaryPadding = _topic.env.config.secondaryPadding;
+        const { padding, secondaryPadding } = _topic.env.config;
         let width = 0, height = 0, x = 0, y = 0;
         let sizingContext = null;
 

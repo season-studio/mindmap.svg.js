@@ -50,7 +50,7 @@ The default configuration of the mindmap
 | siblingMargin | <code>Number</code> | The margin during the children of the first kind topic |
 | secondarySiblingMargin | <code>Number</code> | The margin during the children of the secondary kind topic |
 | secondaryTopicLevel | <code>Number</code> | The level to distinguish the secondary kind topic from the first kind topic |
-| suitableTitleLineWidth | <code>Number</code> | The suitable width of the title line of the topic. If the total width the title and the extension is larger then this value, the renderer will try to break them into two line |
+| maxTopicLineWidth | <code>Number</code> | The max width of the topic line |
 | directionPriority | <code>String</code> | Special the primary side to layout the children of the first topic. The avaliable value is "left" or "right" |
 | dragStartFocusFilterTimer | <code>Number</code> | The time to wake up the drag-drop action after mousedown in the focus topic |
 | dragStartNoFocusFilterTimer | <code>Number</code> | The time to wake up the drag-drop action after mousedown in the nofocus topic |
