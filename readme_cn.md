@@ -140,6 +140,9 @@ TopicExtensionFactor模板的具体实例，可以参考[常见扩展元素的�
 
 ## 发布记录
 
+### 1.0.7
+- 修改getContrlMapKey，令空格键被记录为"Space"，并且可以过滤掉只有Control/Alt/Shift等元键的情况
+
 ### 1.0.6
 - 增加主题标题可以拆分成多行的支持
 - 在Environment中增加topic-rendering-extend事件，用以支持扩展渲染处理

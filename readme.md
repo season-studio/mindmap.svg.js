@@ -140,6 +140,9 @@ The extension should listen the event "topic-event-trigger" and "topic-event-edi
 
 ## Release Notes
 
+### 1.0.7
+- Change getContrlMapKey for logging space key as "Space" and filter the single meta keys
+
 ### 1.0.6
 - Let the title of the topic can be break into multi-line
 - Add the "topic-rendering-extend" event into the environment to perform the extending rendering function
